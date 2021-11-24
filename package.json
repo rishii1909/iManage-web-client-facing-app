@@ -9,9 +9,23 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ant-design/charts": "^1.2.14",
+    "@ant-design/icons": "^4.7.0",
+    "@ant-design/pro-layout": "^6.26.4",
+    "ant-design-pro": "^2.3.2",
+    "antd": "^4.16.13",
+    "axios": "^0.23.0",
+    "clone": "^2.1.2",
+    "dotenv": "^10.0.0",
+    "fs": "^0.0.1-security",
+    "less": "^4.1.2",
+    "less-loader": "^10.1.0",
     "next": "11.1.2",
+    "next-plugin-antd-less": "^1.4.3",
+    "null-loader": "^4.0.1",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "webpack": "^5.58.2"
   },
   "devDependencies": {
     "eslint": "8.0.1",

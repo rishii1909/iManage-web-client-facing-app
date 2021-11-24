@@ -1,0 +1,8 @@
+.agent-list-item:hover, .agent-list-item:active {
+    background-color: rgba(211, 211, 211, 0.301);
+    cursor: pointer;
+}
+.agent-list-item{
+    padding: 1em 0.4em !important;
+    transition: 0.3s;
+}

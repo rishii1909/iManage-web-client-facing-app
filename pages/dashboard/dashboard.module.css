@@ -1,0 +1,9 @@
+.pie-wrapper { 
+    justify-content : center;
+    align-items : center;
+    display : flex;
+    position : absolute;
+    width: 100%;
+    min-height: 280px;
+}
+

@@ -14,3 +14,16 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.ui-list-item:hover, .ui-list-item:active {
+  background-color: rgba(211, 211, 211, 0.301);
+  cursor: pointer;
+}
+.ui-list-item{
+  padding: 1em 0.4em !important;
+  transition: 0.3s;
+}
+
+.ui-list-item:not(:last-child){
+  border-bottom: 1px solid rgba(211, 211, 211) !important;
+}
