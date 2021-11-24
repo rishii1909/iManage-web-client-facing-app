@@ -5,8 +5,7 @@ import { useState, useEffect } from 'react';
 import { secure_axios } from '../../../../helpers/auth'
 import { Router, useRouter } from "next/router";
 import Link from "next/link";
-import { snmp, types } from "../dict";
-
+import { snmp, types } from "../../../../helpers/agents/dict";
 
 const agent_view = () => {
     const router = useRouter();

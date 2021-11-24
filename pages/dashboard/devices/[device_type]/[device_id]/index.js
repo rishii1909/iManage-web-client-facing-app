@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { secure_axios, handle_error } from '../../../../../helpers/auth'
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { snmp, types } from "../../dict";
+import { snmp, types } from "../../../../../helpers/devices/dict";
 import BreadcrumbItem from "antd/lib/breadcrumb/BreadcrumbItem";
 import { capitalizeFirstLetter, monitor_types } from "../../../../../helpers/format";
 import { DeleteFilled, PlusOutlined } from "@ant-design/icons";

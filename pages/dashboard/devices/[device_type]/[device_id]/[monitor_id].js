@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { secure_axios } from '../../../../../helpers/auth'
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { snmp, types } from "../../dict";
+import { snmp, types } from "../../../../../helpers/devices/dict";
 import BreadcrumbItem from "antd/lib/breadcrumb/BreadcrumbItem";
 import { capitalizeFirstLetter, monitor_types } from "../../../../../helpers/format";
 import { DownOutlined, PlusOutlined, UpOutlined } from "@ant-design/icons";

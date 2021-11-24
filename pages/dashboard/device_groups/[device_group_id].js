@@ -118,24 +118,13 @@ const ViewTemplateIndex = () => {
                     allowClear
 
                 >
-                    <OptGroup label="User devices">
-                    {userDevices && 
-                    userDevices.map((el) => {
+                    {devices && 
+                    devices.map((el) => {
                       return (
                         <Option value={el._id} key={el._id}>{el.name}</Option>
                       )
                     })
                     }
-                    </OptGroup>
-                    <OptGroup label="Team devices">
-                    {teamDevices && 
-                    teamDevices.map((el) => {
-                      return (
-                        <Option value={el._id} key={el._id}>{el.name}</Option>
-                      )
-                    })
-                    }
-                    </OptGroup>
                 </Select>
             </Form.Item>
 

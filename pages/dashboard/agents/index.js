@@ -9,7 +9,7 @@ import Dashboard from "../layout/layout";
 import Agent_dashboard from "./Agent_dashboard";
 
 import { Menu, Tabs, List, Row, Col, Tag, Button, Divider, message } from "antd";
-import { snmp, types } from "./dict";
+import { snmp, types } from "../../../helpers/agents/dict";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { TabPane } = Tabs;
