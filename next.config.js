@@ -1,7 +1,7 @@
 // next.config.js
 const withAntdLess = require('next-plugin-antd-less');
 
-API_URL='https://stark-fortress-44852.herokuapp.com/'
+API_URL='https://imanage.host/'
 
 module.exports = withAntdLess({
   // optional
@@ -10,7 +10,7 @@ module.exports = withAntdLess({
 	  '@border-radius-base' : '4px'
 	},
   env: {
-    API_URL: process.env.API_URL || 'https://stark-fortress-44852.herokuapp.com',
+    API_URL: process.env.API_URL || 'https://imanage.host',
   },
   // optional
   lessVarsFilePath: './src/styles/variables.less',
