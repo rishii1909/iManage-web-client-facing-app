@@ -84,7 +84,7 @@ const Agent_Index = () => {
                   <Col span={16}>
                     <List.Item.Meta
                       title={agent.name}
-                      description={`API endpoint : ${agent.api_url}`}
+                      description={agent._id}
                     />
                   </Col>
                 </Row>

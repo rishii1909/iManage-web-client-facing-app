@@ -5,20 +5,74 @@ import { useRouter } from "next/router";
 
 import { getAccessToken, handle_error, secure_axios } from "../../../helpers/auth";
 import Dashboard from "../layout/layout";
-import { Menu, Tabs, List, Row, Col, Tag, Button, Divider, message, Form, Select, Input, Checkbox, Space } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Menu, Tabs, List, Row, Col, Tag, Button, Divider, message, Form, Select, Input, Checkbox, Space, Transfer } from "antd";
+import { ConsoleSqlOutlined, PlusOutlined } from "@ant-design/icons";
 import TreeSelect from "rc-tree-select";
 
 const { TabPane } = Tabs;
 const { Option, OptGroup } = Select;
 
+const filterOption = (inputValue, option) => option.description.indexOf(inputValue) > -1;
+
+const listStyleOptions = {width: '30vw', minWidth : '300px'}
+const transferRowStyles = {display : 'flex', justifyContent : 'space-between'}
+const renderTransferRow = (item) => {
+  return (
+    <div style={transferRowStyles}>{item.name} <Tag>{item.type}</Tag></div>
+  )
+}
+
 const AddGroupIndex = () => {
 
   const router  = useRouter();
-  const [groups, setGroups] = useState(null);
-  const [userDevices, setUserDevices] = useState(null);
-  const [teamDevices, setTeamDevices] = useState(null);
-  const [analyticGroups, setAnalyticGroups] = useState(null);
+
+  const [loadingStatus, setloadingStatus] = useState(false);
+  const [userDevices, setUserDevices] = useState([]);
+  const [teamDevices, setTeamDevices] = useState([]);
+
+  const [analyticGroups, setAnalyticGroups] = useState([]);
+
+  const [analyticGroupsSelectedKeys, setAnalyticGroupsSelectedKeys] = useState([]);
+  const [analyticGroupsTargetKeys, setAnalyticGroupsTargetKeys] = useState();
+  const [devicesSelectedKeys, setDevicesSelectedKeys] = useState([]);
+  const [devicesTargetKeys, setDevicesTargetKeys] = useState();
+
+  const onAnalyticGroupChange = (nextTargetKeys, direction, moveKeys) => {
+    console.log('targetKeys:', nextTargetKeys);
+    console.log('direction:', direction);
+    console.log('moveKeys:', moveKeys);
+    setAnalyticGroupsTargetKeys(nextTargetKeys);
+  };
+
+  const onAnalyticGroupSelectChange = (sourceSelectedKeys, targetSelectedKeys) => {
+    console.log('sourceSelectedKeys:', sourceSelectedKeys);
+    console.log('targetSelectedKeys:', targetSelectedKeys);
+    setAnalyticGroupsSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys]);
+  };
+
+  const onAnalyticGroupScroll = (direction, e) => {
+    console.log('direction:', direction);
+    console.log('target:', e.target);
+  };
+
+  const onDevicesChange = (nextTargetKeys, direction, moveKeys) => {
+    console.log('targetKeys:', nextTargetKeys);
+    console.log('direction:', direction);
+    console.log('moveKeys:', moveKeys);
+    setDevicesTargetKeys(nextTargetKeys);
+  };
+
+  const onDevicesSelectChange = (sourceSelectedKeys, targetSelectedKeys) => {
+    console.log('sourceSelectedKeys:', sourceSelectedKeys);
+    console.log('targetSelectedKeys:', targetSelectedKeys);
+    setDevicesSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys]);
+  };
+
+  const onDevicesScroll = (direction, e) => {
+    console.log('direction:', direction);
+    console.log('target:', e.target);
+  };
+
   useEffect(() => {
     fetchOptions();
     
@@ -33,7 +87,7 @@ const AddGroupIndex = () => {
           (response) => {
             console.log("User response : ", response);
             if(response.accomplished){
-                setUserDevices(response.response);
+              setUserDevices(response.response.map(obj =>  { return {name : obj.name, key : obj._id, type : "User"} }));
             }else{
                 handle_error(response)
             }
@@ -46,7 +100,7 @@ const AddGroupIndex = () => {
         (response) => {
           console.log("Team response : ", response);
           if(response.accomplished){
-            setTeamDevices(response.response);
+            setTeamDevices(response.response.map(obj =>  { return {name : obj.name, key : obj._id, type : "Team"} }));
           }else{
               handle_error(response)
           }
@@ -59,7 +113,9 @@ const AddGroupIndex = () => {
       (response) => {
         if(response.accomplished){
           const data = response.response.response;
-          setAnalyticGroups(data.analytic_groups);
+          const options = data.analytic_groups.map((obj) => {return {name : obj.name, description : obj.name, key : obj._id}});
+          console.log(options)
+          setAnalyticGroups(options);
         }
       }
     )
@@ -130,54 +186,43 @@ const AddGroupIndex = () => {
             <Form.Item 
                 name='devices'
                 label='Devices'
-                rules={[{required : true, message : "Please select atleast one device"}]}
-            >
-                <Select 
-                    placeholder="Select devices"
-                    mode="multiple"
-                    allowClear
-
-                >
-                    <OptGroup label="User devices">
-                    {userDevices && 
-                    userDevices.map((el) => {
-                      return (
-                        <Option value={el._id} key={el._id}>{el.name}</Option>
-                      )
-                    })
-                    }
-                    </OptGroup>
-                    <OptGroup label="Team devices">
-                    {teamDevices && 
-                    teamDevices.map((el) => {
-                      return (
-                        <Option value={el._id} key={el._id}>{el.name}</Option>
-                      )
-                    })
-                    }
-                    </OptGroup>
-                </Select>
+                // rules={[{required : true, message : "Please select atleast one device"}]}
+            > 
+                <Transfer
+                  dataSource={userDevices.concat(teamDevices)}
+                  showSearch
+                  titles={['Devices', 'Selected Devices']}
+                  oneWay
+                  pagination
+                  targetKeys={devicesTargetKeys}
+                  selectedKeys={devicesSelectedKeys}
+                  onChange={onDevicesChange}
+                  onSelectChange={onDevicesSelectChange}
+                  onScroll={onDevicesScroll}
+                  render={item => renderTransferRow(item)}
+                  listStyle={listStyleOptions}
+                />
             </Form.Item>
 
             <Form.Item 
                 name='analytic_groups'
                 label='Analytic Groups'
-                rules={[{required : true, message : "Please select atleast one analytic group"}]}
+                // rules={[{required : true, message : "Please select atleast one analytic group"}]}
             >
-                <Select 
-                    placeholder="Select analytic groups"
-                    mode="multiple"
-                    allowClear
-
-                >
-                    {analyticGroups && 
-                    analyticGroups.map((el) => {
-                      return (
-                        <Option value={el._id} key={el._id}>{el.name}</Option>
-                      )
-                    })
-                    }
-                </Select>
+                <Transfer
+                  dataSource={analyticGroups}
+                  showSearch
+                  titles={['Analytic Groups', 'Selected']}
+                  oneWay
+                  pagination
+                  targetKeys={analyticGroupsTargetKeys}
+                  selectedKeys={analyticGroupsSelectedKeys}
+                  onChange={onAnalyticGroupChange}
+                  onSelectChange={onAnalyticGroupSelectChange}
+                  onScroll={onAnalyticGroupScroll}
+                  render={item => item.name}
+                  listStyle={listStyleOptions}
+                />
             </Form.Item>
             
             <Form.Item {...tailLayout}>

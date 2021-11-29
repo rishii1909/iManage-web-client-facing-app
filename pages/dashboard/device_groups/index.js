@@ -44,17 +44,17 @@ const DeviceGroupsIndex = () => {
   function deleteNotification(id, name){
       const loading = message.loading("Deleting " + name + "...")
       secure_axios(
-          '/notifs/delete',
-          {notif_id : id},
+          '/device_groups/delete',
+          {device_group_id : id},
           router,
           (response) => {
+            loading()
             if(response.accomplished){
                 message.success("Device Group deleted successfully!")
                 fetchGroups();
             }else{
                 handle_error(response);
             }
-            loading()
           }
       )
   }

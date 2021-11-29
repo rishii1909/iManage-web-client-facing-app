@@ -24,6 +24,8 @@ a {
   transition: 0.3s;
 }
 
-.ui-list-item:not(:last-child){
-  border-bottom: 1px solid rgba(211, 211, 211) !important;
+/* .ui-list-item:not(:last-child){ */
+.ui-list-item{
+  border-bottom: 1px solid rgba(211, 211, 211, 0.644) !important;
+  /* border-top: 1px solid rgba(211, 211, 211, 0.644) !important; */
 }

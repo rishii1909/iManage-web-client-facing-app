@@ -1,9 +1,11 @@
-import {Form, Input, InputNumber, message, Select, Button} from "antd";
+import {Form, Input, InputNumber, message, Select, Button, Collapse} from "antd";
 import { useRouter } from "next/router";
 import{ useState, useEffect } from 'react';
-import { secure_axios } from "../../../helpers/auth";
+import { handle_error, secure_axios } from "../../../helpers/auth";
+
 const {Option} = Select;
 const {TextArea} = Input;
+const { Panel } = Collapse;
 
 const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id}) => {
     const [teamAgents, setTeamAgents] = useState(null);
@@ -63,7 +65,7 @@ const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id}) => {
                     if(response.accomplished){
                         setProcessors(response.response.enumerate);
                     }else{
-                        message.error(response.response.message ? response.response.message : response.response)
+                        handle_error(response)
                     }
                 }
             )
@@ -100,6 +102,7 @@ const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id}) => {
                     <Select 
                         placeholder={`Choose a processor.`}
                         onChange={val => setProc_id(val)}
+                        value={proc_id}
                     >
                         {processors && Object.keys(processors).map((key)=>{
                             return <Option value={key} key={key}>{processors[key]}</Option>
@@ -118,8 +121,11 @@ const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id}) => {
                 >
                     <InputNumber 
                     placeholder="Usage %" 
-                    formatter={val => `${val} %`}
-                    parser={val => val.replace(' %', '')}
+                    min={5}
+                    max={100}
+                    addonAfter=" &"
+                    formatter={value => `${value} %`}
+                    parser={value => value.replace(' %', '').replace(' ', '')}
                     />
                 </Form.Item>
 
@@ -133,8 +139,10 @@ const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id}) => {
                 >
                     <InputNumber 
                     placeholder="Usage %" 
-                    formatter={val => `${val} %`}
-                    parser={val => val.replace(' %', '')}
+                    min={5}
+                    max={100}
+                    formatter={value => `${value} %`}
+                    parser={value => value.replace(' %', '').replace(' ', '')}
                     />
                 </Form.Item>
 

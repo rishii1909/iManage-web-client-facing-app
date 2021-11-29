@@ -5,18 +5,67 @@ import { useRouter } from "next/router";
 
 import { getAccessToken, handle_error, secure_axios } from "../../../helpers/auth";
 import Dashboard from "../layout/layout";
-import { Menu, Tabs, List, Row, Col, Tag, Button, Divider, message, Form, Select, Input, Checkbox, Space } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Menu, Tabs, List, Label, Col, Tag, Button, Divider, message, Form, Select, Input, Transfer, Space, Switch } from "antd";
 
 const { TabPane } = Tabs;
-const { Option, OptGroup } = Select;
-
+const listStyleOptions = {width: '30vw', minWidth : '300px'}
+const transferRowStyles = {display : 'flex', justifyContent : 'space-between'}
+const renderTransferRow = (item) => {
+  return (
+    <div style={transferRowStyles}>{item.name} <Tag>{item.type}</Tag></div>
+  )
+}
 const ViewTemplateIndex = () => {
 
   const router  = useRouter();
+
   const {device_group_id} = router.query;
-  const [devices, setDevices] = useState(null);
-  const [analyticGroups, setAnalyticGroups] = useState(null);
+  const [loadingStatus, setloadingStatus] = useState(false);
+  const [userDevices, setUserDevices] = useState([]);
+  const [teamDevices, setTeamDevices] = useState([]);
+
+  const [analyticGroups, setAnalyticGroups] = useState([]);
+
+  const [analyticGroupsSelectedKeys, setAnalyticGroupsSelectedKeys] = useState([]);
+  const [analyticGroupsTargetKeys, setAnalyticGroupsTargetKeys] = useState();
+  const [devicesSelectedKeys, setDevicesSelectedKeys] = useState([]);
+  const [devicesTargetKeys, setDevicesTargetKeys] = useState();
+
+  const onAnalyticGroupChange = (nextTargetKeys, direction, moveKeys) => {
+    console.log('targetKeys:', nextTargetKeys);
+    console.log('direction:', direction);
+    console.log('moveKeys:', moveKeys);
+    setAnalyticGroupsTargetKeys(nextTargetKeys);
+  };
+
+  const onAnalyticGroupSelectChange = (sourceSelectedKeys, targetSelectedKeys) => {
+    console.log('sourceSelectedKeys:', sourceSelectedKeys);
+    console.log('targetSelectedKeys:', targetSelectedKeys);
+    setAnalyticGroupsSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys]);
+  };
+
+  const onAnalyticGroupScroll = (direction, e) => {
+    console.log('direction:', direction);
+    console.log('target:', e.target);
+  };
+
+  const onDevicesChange = (nextTargetKeys, direction, moveKeys) => {
+    console.log('targetKeys:', nextTargetKeys);
+    console.log('direction:', direction);
+    console.log('moveKeys:', moveKeys);
+    setDevicesTargetKeys(nextTargetKeys);
+  };
+
+  const onDevicesSelectChange = (sourceSelectedKeys, targetSelectedKeys) => {
+    console.log('sourceSelectedKeys:', sourceSelectedKeys);
+    console.log('targetSelectedKeys:', targetSelectedKeys);
+    setDevicesSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys]);
+  };
+
+  const onDevicesScroll = (direction, e) => {
+    console.log('direction:', direction);
+    console.log('target:', e.target);
+  };
 
   const layout = {
     labelCol: { offset : 1, span: 4},
@@ -32,8 +81,9 @@ const ViewTemplateIndex = () => {
   }, [device_group_id]);
 
   const fetchGroup = (device_group_id) => {
-    if(device_group_id && form){
-        const loading = message.loading("Fetching Device Group...")
+    if(device_group_id && form && loadingStatus === false){
+        const loading = message.loading("Fetching Device Group data...");
+        setloadingStatus(true)
     secure_axios(
             '/device_groups/enumerate',
             {device_group_id},
@@ -45,20 +95,65 @@ const ViewTemplateIndex = () => {
                     form.setFieldsValue({
                       name : data.name,
                     });
-                    setAnalyticGroups(data.analytic_groups);
-                    setDevices(data.devices);
+                    setAnalyticGroupsTargetKeys(data.analytic_groups.map((obj) => {return obj._id}));
+                    setDevicesTargetKeys(data.devices.map((obj) => {return obj._id}));
+                    
                 }else{
                     handle_error(response);
                 }
               loading();
+              setloadingStatus(false)
+
             }
         )
+        secure_axios(
+          '/teams/enumerate',
+          {},
+          router,
+          (response) => {
+            if(response.accomplished){
+              const data = response.response.response;
+              const analytic_groups = data.analytic_groups.map((obj) => {return {name : obj.name, description : obj.name, key : obj._id}});
+              setAnalyticGroups(analytic_groups);
+            }
+          }
+        )
+        
+
+        secure_axios(
+          '/devices/enumerate/user',
+          {},
+          router,
+          (response) => {
+            console.log("User response : ", response);
+            if(response.accomplished){
+              setUserDevices(response.response.map(obj =>  { return {name : obj.name, description : obj.name, key : obj._id, type : "User"} }));
+            }else{
+                handle_error(response)
+            }
+          }
+      )
+      secure_axios(
+        '/devices/enumerate/team',
+        {},
+        router,
+        (response) => {
+          console.log("Team response : ", response);
+          if(response.accomplished){
+            setTeamDevices(response.response.map(obj =>  { return {name : obj.name, description : obj.name, key : obj._id, type : "Team"} }));
+          }else{
+              handle_error(response)
+          }
+        }
+    )
     }
   }
 
   const on_finish = async (data) => {
+      if(loadingStatus) return;
       const loading = message.loading("Updating Device Group...", 0);
-      await secure_axios("/notifs/update", {...data, ...{notif_id : device_group_id}}, router, (response) => {
+      setloadingStatus(true);
+      await secure_axios("/device_groups/update", {...data, ...{device_group_id : device_group_id}}, router, (response) => {
           if(response.accomplished){
               message.success("Device Group updated successfully!").then(()=> fetchGroup(device_group_id));
           }else{
@@ -67,6 +162,7 @@ const ViewTemplateIndex = () => {
               // })
           }
           loading();
+          setloadingStatus(false);
       })
       
   }
@@ -110,49 +206,49 @@ const ViewTemplateIndex = () => {
             <Form.Item 
                 name='devices'
                 label='Devices'
-                rules={[{required : true, message : "Please select atleast one device"}]}
-            >
-                <Select 
-                    placeholder="Select devices"
-                    mode="multiple"
-                    allowClear
-
-                >
-                    {devices && 
-                    devices.map((el) => {
-                      return (
-                        <Option value={el._id} key={el._id}>{el.name}</Option>
-                      )
-                    })
-                    }
-                </Select>
+                // rules={[{required : true, message : "Please select atleast one device"}]}
+            > 
+                <Transfer
+                  dataSource={userDevices.concat(teamDevices)}
+                  showSearch
+                  titles={['Devices', 'Selected Devices']}
+                  oneWay
+                  pagination
+                  targetKeys={devicesTargetKeys}
+                  selectedKeys={devicesSelectedKeys}
+                  onChange={onDevicesChange}
+                  onSelectChange={onDevicesSelectChange}
+                  onScroll={onDevicesScroll}
+                  render={item => renderTransferRow(item)}
+                  listStyle={listStyleOptions}
+                />
             </Form.Item>
 
             <Form.Item 
                 name='analytic_groups'
                 label='Analytic Groups'
-                rules={[{required : true, message : "Please select atleast one analytic group"}]}
+                // rules={[{required : true, message : "Please select atleast one analytic group"}]}
             >
-                <Select 
-                    placeholder="Select analytic groups"
-                    mode="multiple"
-                    allowClear
-
-                >
-                    {analyticGroups && 
-                    analyticGroups.map((el) => {
-                      return (
-                        <Option value={el._id} key={el._id}>{el.name}</Option>
-                      )
-                    })
-                    }
-                </Select>
+                <Transfer
+                  dataSource={analyticGroups}
+                  showSearch
+                  titles={['Analytic Groups', 'Selected Groups']}
+                  oneWay
+                  pagination
+                  targetKeys={analyticGroupsTargetKeys}
+                  selectedKeys={analyticGroupsSelectedKeys}
+                  onChange={onAnalyticGroupChange}
+                  onSelectChange={onAnalyticGroupSelectChange}
+                  onScroll={onAnalyticGroupScroll}
+                  render={item => item.name}
+                  listStyle={listStyleOptions}
+                />
             </Form.Item>
             
             <Form.Item {...tailLayout}>
                 <Space size='large'>
                 <Button type="primary" htmlType='submit'>
-                    Create
+                    Update
                 </Button>
                 <Button type="ghost" htmlType='reset'>
                     Reset

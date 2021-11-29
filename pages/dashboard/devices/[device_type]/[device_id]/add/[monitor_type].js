@@ -44,7 +44,7 @@ const create_monitor_view = () => {
     const router = useRouter();
     const { device_type, device_id, monitor_type } = router.query;
     const [metaData, setMetaData] = useState({});
-    const [accordion, setAccordion] = useState(1);
+    const [accordion, setAccordion] = useState(0);
     const [admins_checked, setAdmins_checked] = useState(false);
     const [device, setDevice] = useState(null);
     const [agent_id, setAgent_id] = useState(null);
@@ -172,7 +172,7 @@ const create_monitor_view = () => {
                             flexFlow : 'column'
                         }}
                     >
-                        <Collapse activeKey={accordion}>
+                        <Collapse defaultActiveKey={accordion}>
                             <Panel forceRender header="Details" key={0}>
                                 { (device_type && device) && 
                                 <DetailsPanel 
@@ -183,7 +183,7 @@ const create_monitor_view = () => {
                                 >
                                 </DetailsPanel> }
                                 <RightAlignedButtonWrapper>
-                                    <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(1)}>Next</Button>
+                                    {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion([0,1])}>Next</Button> */}
                                 </RightAlignedButtonWrapper>
                             </Panel>
                             <Panel forceRender header="Settings" key={1}>
@@ -199,29 +199,29 @@ const create_monitor_view = () => {
                                     />
                                 }
                                 <RightAlignedButtonWrapper>
-                                    <Button icon={<UpOutlined/>} onClick={()=>setAccordion(0)}>Previous</Button>
-                                    <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(2)}>Next</Button>
+                                    {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(0)}>Previous</Button> */}
+                                    {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion([0,1,2])}>Next</Button> */}
                                 </RightAlignedButtonWrapper>
                             </Panel>
                             <Panel forceRender header="Retention Schedule" key={2}>
                                 <RetentionSchedulePanel/>
                                 <RightAlignedButtonWrapper>
-                                    <Button icon={<UpOutlined/>} onClick={()=>setAccordion(1)}>Previous</Button>
-                                    <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(3)}>Next</Button>
+                                    {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(1)}>Previous</Button> */}
+                                    {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion()}>Next</Button> */}
                                 </RightAlignedButtonWrapper>
                             </Panel>
                             <Panel forceRender header="Notification Template" key={3}>
                                 <NotificationTemplatePanel/>
                                 <RightAlignedButtonWrapper>
-                                    <Button icon={<UpOutlined/>} onClick={()=>setAccordion(2)}>Previous</Button>
-                                    <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(4)}>Next</Button>
+                                    {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(2)}>Previous</Button> */}
+                                    {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(4)}>Next</Button> */}
                                 </RightAlignedButtonWrapper>
                             </Panel>
                             <Panel forceRender header="Notification Rules" key={4}>
                                 <NotificationRulesPanel/>
                                 <RightAlignedButtonWrapper>
-                                    <Button icon={<UpOutlined/>} onClick={()=>setAccordion(3)}>Previous</Button>
-                                    <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(5)}>Next</Button>
+                                    {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(3)}>Previous</Button> */}
+                                    {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(5)}>Next</Button> */}
                                 </RightAlignedButtonWrapper>
                             </Panel>
                             <Panel forceRender header="Admin" key={5}>
@@ -239,8 +239,8 @@ const create_monitor_view = () => {
 
                                 </List>
                                 <RightAlignedButtonWrapper>
-                                    <Button icon={<UpOutlined/>} onClick={()=>setAccordion(4)}>Previous</Button>
-                                    <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(5)}>Next</Button>
+                                    {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(4)}>Previous</Button> */}
+                                    {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(5)}>Next</Button> */}
                                 </RightAlignedButtonWrapper>
                             </Panel>
                         </Collapse>
