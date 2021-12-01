@@ -15,6 +15,16 @@ a {
   box-sizing: border-box;
 }
 
+.notification-dot{
+  height: 6px;
+  width: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  background-color: #D7263D;
+  position: absolute;
+  right: 12px;
+  top: 20px;
+}
 .ui-list-item:hover, .ui-list-item:active {
   background-color: rgba(211, 211, 211, 0.301);
   cursor: pointer;

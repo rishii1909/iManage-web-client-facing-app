@@ -3,7 +3,7 @@ import { Form, Button, message, Select, Breadcrumb, Tabs, List, Switch, Divider 
 const { Option } = Select;
 import Device_dashboard from "../../../Device_dashboard"
 import { useState, useEffect } from 'react';
-import { secure_axios } from '../../../../../../helpers/auth'
+import { handle_error, secure_axios } from '../../../../../../helpers/auth'
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { snmp, types } from "../../../../../../helpers/devices/dict";
@@ -17,6 +17,7 @@ import RetentionSchedulePanel from "../../../../../../components/monitors/Retent
 import NotificationRulesPanel from "../../../../../../components/monitors/NotificationRules";
 import NotificationTemplatePanel from "../../../../../../components/monitors/NotificationTemplate";
 import dynamic from 'next/dynamic'
+import AssignAdminsPanel from "../../../../../../components/monitors/AssignAdmins";
 
 var valid_monitors = [
   "uptime_monitor",
@@ -44,7 +45,7 @@ const create_monitor_view = () => {
     const router = useRouter();
     const { device_type, device_id, monitor_type } = router.query;
     const [metaData, setMetaData] = useState({});
-    const [accordion, setAccordion] = useState(0);
+    const [accordion, setAccordion] = useState(5);
     const [admins_checked, setAdmins_checked] = useState(false);
     const [device, setDevice] = useState(null);
     const [agent_id, setAgent_id] = useState(null);
@@ -78,42 +79,84 @@ const create_monitor_view = () => {
     }, [device_id]);
 
 
-
+    form.setFieldsValue({test : "testing"})
     const on_finish = async (data) => {
-        console.log(data);
-        const merged = {...data, ...(device.creds)};
+        console.log(data)
+        let notification_rules = {};
+        if(data.custom == "every"){
+            notification_rules = {
+                alert_all : true,
+                alert_rules : {
+                    every : parseInt(data.every_count)
+                }
+            }
+        }else if(data.custom == "custom"){
+            notification_rules = {
+                alert_all : false,
+                alert_rules : {
+                    fto : data.fto,
+                    wto : data.wto,
+                    otow : data.otow,
+                    owtof : data.owtof,
+                    owtof_count : data.owtof_count,
+                    otow_count : data.otow_count,
+                }
+            }
+        }else{
+            notification_rules = {
+                alert_all : true,
+                alert_rules : {
+                    every : 1
+                }
+            }
+        }
+        const merged = {...data, ...(device.creds), notification_rules};
         if(data.host) merged.host = data.host;
         merged.type = monitor_type;
         merged.device_id = device_id
         const loading = message.loading("Creating monitor...", 0);
-        await secure_axios(`/monitors/create/${device_type}`, merged, router, (response) => {
-            console.log(response)
-            if(response.accomplished){
-                message.success("Monitor created successfully!")
-                // message.success("Device created successfully!").then(()=> router.push('/dashboard/devices'));
-                // loading.then(() => {
-                // })
-                // Router.push('/dashboard/devices')
-            }else{
-                if(response.response){
-                    const resp = response.response
-                    if(resp.message){
-                        message.error(resp.message);
-                    }
-                    else if(resp.error){
-                        message.error(resp.error)
-                    }else{
-                        message.error(resp)
-                    }
-                }else{
-                    if(response.error) message.error(response.error);
+        if(data.template_name){
+            await secure_axios('/notifs/create', {
+                name : data.template_name,
+                header : data.template_header,
+                body : data.template_body
+            },
+            router,
+            (response) => {
+                if(response.accomplished){
+                    merged.notification_template = response._id;
+                    secure_axios(`/monitors/create/${device_type}`, merged, router, (response) => {
+                        console.log(response)
+                        if(response.accomplished){
+                            message.success("Monitor created successfully!")
+                            // message.success("Device created successfully!").then(()=> router.push('/dashboard/devices'));
+                            // loading.then(() => {
+                            // })
+                            // Router.push('/dashboard/devices')
+                        }else{
+                            handle_error(response);
+                        }
+                        loading();
+                    })
                 }
-
-                // loading.then(() => {
-                // })
-            }
-            loading();
-        })
+            })
+        }else{
+            await secure_axios(`/monitors/create/${device_type}`, merged, router, (response) => {
+                console.log(response)
+                if(response.accomplished){
+                    message.success("Monitor created successfully!")
+                    router.push(`/dashboard/devices/${device_type}/${device_id}`)
+                    // message.success("Device created successfully!").then(()=> router.push('/dashboard/devices'));
+                    // loading.then(() => {
+                    // })
+                    // Router.push('/dashboard/devices')
+                }else{
+                    handle_error(response);
+                }
+                loading();
+            })
+        }
+        
         
     }
 
@@ -218,26 +261,19 @@ const create_monitor_view = () => {
                                 </RightAlignedButtonWrapper>
                             </Panel>
                             <Panel forceRender header="Notification Rules" key={4}>
-                                <NotificationRulesPanel/>
+                                <NotificationRulesPanel form={form} />
                                 <RightAlignedButtonWrapper>
                                     {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(3)}>Previous</Button> */}
                                     {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(5)}>Next</Button> */}
                                 </RightAlignedButtonWrapper>
                             </Panel>
-                            <Panel forceRender header="Admin" key={5}>
+                            <Panel forceRender header="Assign Admins" key={5}>
                                 <RightAlignedButtonWrapper>
-                                    <Switch checkedChildren="Assigned" unCheckedChildren="All" onChange={(e)=> setAdmins_checked(e)} checked={admins_checked}></Switch>
+                                    {/* <Switch checkedChildren="Assigned" unCheckedChildren="All" onChange={(e)=> setAdmins_checked(e)} checked={admins_checked}></Switch> */}
                                 </RightAlignedButtonWrapper>
-                                <List
-                                    dataSource={admins_checked ? [] : dummy_admins}
-                                    renderItem={item => (
-                                        <List.Item>
-                                            {item.name}
-                                        </List.Item>
-                                    )}
-                                >
 
-                                </List>
+                                <AssignAdminsPanel form={form} />
+
                                 <RightAlignedButtonWrapper>
                                     {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(4)}>Previous</Button> */}
                                     {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(5)}>Next</Button> */}

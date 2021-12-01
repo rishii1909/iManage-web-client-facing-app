@@ -130,7 +130,6 @@ const AddGroupIndex = () => {
   const [form] = Form.useForm();
 
   const on_finish = async (data) => {
-      console.log(data);
       const loading = message.loading("Creating Device Group...", 0);
       await secure_axios("/device_groups/create", data, router, (response) => {
           if(response.accomplished){

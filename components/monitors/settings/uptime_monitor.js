@@ -11,9 +11,10 @@ const UptimeMonitorSettings = ({hostname}) => {
                 <Form.Item
                     name='target'
                     label="Hostname"
-                    // rules={[{required : true, message : "Please enter a name for this monitor."}]}
+                    rules={[{required : true, message : "Please enter a name for this monitor."}]}
+                    initialValue={hostname ? hostname : ""}
                 >
-                    <Input name="target" defaultValue={hostname ? hostname : ""}></Input>
+                    <Input></Input>
                 </Form.Item>
 
                 <Form.Item

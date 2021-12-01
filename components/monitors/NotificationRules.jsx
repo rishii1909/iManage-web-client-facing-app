@@ -5,16 +5,18 @@ import{ useState } from 'react';
 
 const { Option } = Select;
 
-const NotificationRulesPanel = () => {
+const NotificationRulesPanel = ({form}) => {
     
     const [custom, setCustom] = useState(null);
     const [wtof, setWtof] = useState(false);
-    const [otof, setOtof] = useState(false);
+    const [otow, setotow] = useState(false);
+    const [owtof_count_check, setOwtof_count_check] = useState(false);
+    const [otow_count_check, setOtow_count_check] = useState(false);
     
     return (
             <>
                 <Form.Item
-                    name='notif_rules'
+                    name='custom'
                     label="Notification trigger events"
                     // rules={[{required : true, message : "Please enter a name for this monitor."}]}
                     valuePropName="value"
@@ -57,47 +59,51 @@ const NotificationRulesPanel = () => {
 
                 {custom === "custom" && 
                     <Form.Item
-                        name="custom"
+                        name="custom_config"
                         label="Alert after every selected events"
                         valuePropName="value"
                     >
-                    {/* <Select 
-                        placeholder="Select trigger events"
-                        mode="multiple"
-                        // value={custom}
-                        // onChange={(val) => { setCustom(val); }}
-                    >
-                        <Option value="0" > Every OK/Warning to Failure </Option>
-                        <Option value="1" > Every Failure to OK </Option>
-                        <Option value="2" > Every OK to Warning </Option>
-                        <Option value="3" > Every Warning to OK </Option>
-                    </Select> */}
+                    
                         <Row>
-                            <Checkbox onChange={(e)=>setWtof(e.target.checked)}> Every OK/Warning to Failure (New Failure) </Checkbox>
+                            <Form.Item name="owtof" valuePropName="checked">
+                                <Checkbox onChange={(e)=>setWtof(e.target.checked)}> Every OK/Warning to Failure (New Failure) </Checkbox>
+                            </Form.Item>
                         </Row> 
                         {wtof && 
                             <Row style={{paddingLeft : "1.2em"}}>
-                                <Checkbox>
-                                And every  <InputNumber min={1} max={3} defaultValue={1} />  failures thereafter
+                                <Form.Item name="owtof_count_wrapper" valuePropName="checked" value>
+                                <Checkbox onChange={e => {setOwtof_count_check(e.target.checked)}}>
+                                And every  <InputNumber disabled={!owtof_count_check} min={1} max={3} defaultValue={1} onChange={(val)=> {form.setFieldsValue({owtof_count : val})}} />  failures thereafter
                                 </Checkbox>
+                                </Form.Item>
+                                <Form.Item name="owtof_count" hidden />
                             </Row>
                         }
                         
                         <Row>
-                            <Checkbox> Every Failure to OK </Checkbox>
+                            <Form.Item name="fto" valuePropName="checked">
+                                <Checkbox> Every Failure to OK </Checkbox>
+                            </Form.Item>
                         </Row> 
                         <Row>
-                            <Checkbox onChange={(e)=>setOtof(e.target.checked)} > Every OK to Warning (New Warning)</Checkbox>
+                            <Form.Item name="otow" valuePropName="checked">
+                                <Checkbox onChange={(e)=>setotow(e.target.checked)} > Every OK to Warning (New Warning)</Checkbox>
+                            </Form.Item>
                         </Row>
-                        {otof && 
+                        {otow && 
                             <Row style={{paddingLeft : "1.2em"}}>
-                                <Checkbox>
-                                And every  <InputNumber min={1} max={3} defaultValue={1} />  warning thereafter
+                                <Form.Item name="otow_count_wrapper" valuePropName="checked" >
+                                <Checkbox onChange={e => setOtow_count_check(e.target.checked)} >
+                                And every  <InputNumber min={1} max={3} defaultValue={1} onChange={(val)=> {form.setFieldsValue({otow_count : val})}} />  warning thereafter
                                 </Checkbox>
+                                </Form.Item>
+                                <Form.Item name="otow_count" hidden />
                             </Row>
                         }
                         <Row>
-                            <Checkbox> Every Warning to OK </Checkbox>
+                            <Form.Item name="wto" valuePropName="checked">
+                                <Checkbox> Every Warning to OK </Checkbox>
+                            </Form.Item>
                         </Row>
                     
                     </Form.Item>

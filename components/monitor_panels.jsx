@@ -40,6 +40,7 @@ const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallb
                         <Select 
                             placeholder={`Select ${device_type} agent`}
                             onChange={val => agentCallback(val)}
+                            defaultValue
                         >
                             {teamAgents && teamAgents.map((el)=>{
                                 return <Option value={el._id} key={el._id}><div>{el.name} | <span style={{fontSize : "0.8em", color : "gray"}}>{el.api_url}</span></div></Option>

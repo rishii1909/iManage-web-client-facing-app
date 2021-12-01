@@ -1,14 +1,97 @@
-import { Row, Col, Layout, Menu } from 'antd';
-import { LogoutOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons';
+import { useState, useEffect } from 'react';
+import { Row, Col, Layout, Menu, Drawer, List, Empty, Space, Button, Tag, message, Divider } from 'antd';
+import { BellOutlined, DeleteFilled, DeleteOutlined, LogoutOutlined, ReloadOutlined, SwapRightOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons';
+import NoticeIcon from 'ant-design-pro/lib/NoticeIcon';
 import Link from 'next/link'
-import Router from 'next/router';
-import { logout } from '../../../helpers/auth';
+import Router, { useRouter } from 'next/router';
+import { handle_error, logout, secure_axios } from '../../../helpers/auth';
 import AuthWrapper from '../../../components/AuthWrapper';
 
 
 const { Header, Content, Sider } = Layout;
 const {SubMenu } = Menu;
 export default function dashboard({ domain, subdomain, children }){
+  const router = useRouter();
+  const [notificationDrawer, setNotificationDrawer] = useState(false);
+  const [notifs, setNotifs] = useState([]);
+  const [notifsLoading, setNotifsLoading] = useState(false);
+  function stats(num){
+    switch (num) {
+      case 1:
+        return "Warning"
+        break;
+      case 2: 
+      return "Failure"
+      break;
+
+      case 0:
+      return "OK"
+      break;
+
+      default:
+        break;
+    }
+  }
+
+  function tagColor(p,c,b){
+    // if(p == c){
+    // }
+    if(c == 0) return "green"
+    if(c == 1){
+      return b ?  "red" : "yellow" 
+    }
+    if(c == 2) return "red"
+  }
+
+  function Notifooter({n}){
+    
+    if(n.isBinary && n.current_monitor_status) n.current_monitor_status++;
+    if(n.previous_monitor_status == n.current_monitor_status){
+      return (
+        <Tag color={tagColor(n.current_monitor_status, n.previous_monitor_status, n.isBinary)}>{stats(n.current_monitor_status)}</Tag>
+      )
+    }else{
+      return (
+        <Tag>
+        {stats(n.previous_monitor_status)}
+        <SwapRightOutlined style={{display : "inline-block"}}/>
+        {stats(n.current_monitor_status)}
+        </Tag>
+      )
+    }
+    
+  }
+  useEffect(() => {
+    fetchNotifs();
+    
+  }, []);
+
+  function fetchNotifs(){
+    setNotifsLoading(true);
+    secure_axios('/notifications/enumerate', {}, router, (r) => {
+      setNotifsLoading(false)
+      if(r.accomplished){
+        setNotifs(r.response.notifications)
+      }else{
+        handle_error(r);
+      }
+    })
+  }
+
+  
+
+  function clearNotifications(){
+    secure_axios('/notifications/clear', {}, router, (r) => {
+      if(r.accomplished){
+        message.success(r.response)
+        fetchNotifs();
+      }else{
+        handle_error(r);
+      }
+    })
+  }
+
+  
   const base_route = "/dashboard";
   const UserLogout = (e) => {
     logout(); Router.push('/auth/login')
@@ -16,7 +99,7 @@ export default function dashboard({ domain, subdomain, children }){
     return (
         <AuthWrapper>
           <Layout style={{minHeight : '100vh'}} >
-          <Header className="header">
+          <Header className="header" style={{padding : '0px'}}>
             <div className="logo" />
             
             <Row justify="space-between" wrap={false}>
@@ -29,8 +112,12 @@ export default function dashboard({ domain, subdomain, children }){
                   <Menu.Item key="agents"> <Link href={`${base_route}/agents`}>Agents</Link> </Menu.Item>
             </Menu>
             </Col>
-            <Col span={2}>
-              <Menu theme='dark' mode='horizontal'>
+            <Col span={3}>
+              
+              <Menu theme='dark' mode='horizontal' selectable={false}>
+              <Menu.Item onClick={() => setNotificationDrawer(true)} >
+              <BellOutlined/> {notifs.length > 0 && <span className="notification-dot"></span>}
+              </Menu.Item>
               <SubMenu icon={<UserOutlined/>} title="Profile">
                 <Menu.Item icon={<TeamOutlined/>}>
                   <Link href={`${base_route}/team`}>My Team</Link>
@@ -39,6 +126,7 @@ export default function dashboard({ domain, subdomain, children }){
                 Log out
                 </Menu.Item>
               </SubMenu>
+              
               </Menu>
             </Col>
             </Row>
@@ -73,6 +161,34 @@ export default function dashboard({ domain, subdomain, children }){
                 {children}
               </Content>
             </Layout>
+            <Drawer 
+              title="My Notifications" 
+              width={420} 
+              placement="right" 
+              onClose={() => setNotificationDrawer(false)} 
+              visible={notificationDrawer}
+              >
+                <Button style={{position : "absolute", right : '2em', bottom : '2em'}} onClick={clearNotifications} type="primary" icon={<DeleteOutlined/>}>Clear notifications</Button>
+              <List>
+              {notifs.map(n => {
+                return (
+                  <List.Item>
+                    <List.Item.Meta title={n.header} description={n.body} />
+                    <div style={{display : 'flex', flexFlow : 'row', alignItems : 'right'}}>
+                      <Notifooter n={n}></Notifooter>
+                    </div>
+                  </List.Item>
+                )
+              })}
+              {notifs.length == 0 && 
+                <div style={{display : "flex", alignItems : 'center', flexFlow : 'column'}}>
+                <Empty description="There are no notifications" />
+                <Divider style={{margin : "1em auto"}}/>
+                <Button style={{transform : 'scale(0.9)'}} loading={notifsLoading} onClick={() => fetchNotifs()} primary icon={<ReloadOutlined/>}>Refresh</Button>
+                </div>
+              }
+              </List>
+            </Drawer>
           </Layout>
         </Layout>
         </AuthWrapper>

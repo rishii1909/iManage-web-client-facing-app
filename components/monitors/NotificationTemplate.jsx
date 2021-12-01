@@ -1,7 +1,7 @@
 import {Form, Input, Select} from "antd";
 import FormItem from "antd/lib/form/FormItem";
 import{ useState, useEffect } from 'react';
-import { secure_axios } from "../../helpers/auth";
+import { handle_error, secure_axios } from "../../helpers/auth";
 import { useRouter } from "next/router";
 
 
@@ -19,7 +19,8 @@ const NotificationTemplatePanel = () => {
               if(response.accomplished){
                 setTemplates(response.response);
               }else{
-                // setTemplates([]);
+                  console.log(response)
+                handle_error(response)
               }
             }
             )
@@ -47,21 +48,21 @@ const NotificationTemplatePanel = () => {
                                 <>
                                     <p>No saved notification templates found. Adding data here will create a new Notification Template.</p>
                                     <Form.Item
-                                        name='name'
+                                        name='template_name'
                                         label='Name'
                                         rules={[{required : true, message : "Please enter a name for this template."}]}
                                     >
                                         <Input name='name' placeholder="Name"></Input>
                                     </Form.Item>
                                     <Form.Item
-                                        name='header'
+                                        name='template_header'
                                         label='Subject'
                                         rules={[{required : true, message : "Please enter a subject for this template."}]}
                                     >
                                         <Input name='header' placeholder="Subject"></Input>
                                     </Form.Item>
                                     <Form.Item
-                                        name='body'
+                                        name='template_body'
                                         label='Body'
                                         rules={[{required : true, message : "Please enter a body for this template."}]}
                                     >
