@@ -43,27 +43,42 @@ const DashboardIndex = () => {
       {},
       router,
       (response) => {
-        console.log(response)
-        if(response.accomplished){
-          const two_keys = Object.keys(response.response.level_1.two_states)
-          const three_keys = Object.keys(response.response.level_1.three_states)
-          const two_states = []
-          const three_states = []
-          three_keys.forEach((key) => {
-            dict_three_states[key] && three_states.push({
-              type : dict_three_states[key],
-              monitors : response.response.level_1.three_states[key]
+        try {
+          console.log(response)
+          if(response.accomplished){
+            if(response.response == []){
+              setTwoStates([]);
+              setLoaded_two_states(true);
+              setThreeStates([]);
+              setLoaded_three_states(true);
+              return message.info("No monitors found.");
+            }
+            const two_keys = Object.keys(response.response.level_1.two_states)
+            const three_keys = Object.keys(response.response.level_1.three_states)
+            const two_states = []
+            const three_states = []
+            three_keys.forEach((key) => {
+              dict_three_states[key] && three_states.push({
+                type : dict_three_states[key],
+                monitors : response.response.level_1.three_states[key]
+              })
             })
-          })
-          two_keys.forEach((key) => {
-            dict_two_states[key] && two_states.push({
-              type : dict_two_states[key],
-              monitors : response.response.level_1.two_states[key]
+            two_keys.forEach((key) => {
+              dict_two_states[key] && two_states.push({
+                type : dict_two_states[key],
+                monitors : response.response.level_1.two_states[key]
+              })
             })
-          })
-          setTwoStates(two_states);
+            setTwoStates(two_states);
+            setLoaded_two_states(true);
+            setThreeStates(three_states);
+            setLoaded_three_states(true);
+          }
+        } catch (error) {
+          console.log(error);
+          setTwoStates([]);
           setLoaded_two_states(true);
-          setThreeStates(three_states);
+          setThreeStates([]);
           setLoaded_three_states(true);
         }
       }

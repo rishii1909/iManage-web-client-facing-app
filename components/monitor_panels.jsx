@@ -61,7 +61,7 @@ const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallb
                     <Form.Item
                         name={host}
                         label='Name'
-                        rules={[{required : true, message : "Please enter a name for this monitor."}]}
+                        rules={[{required : true, message : "Please enter a hostname."}]}
                     >
                         <Input name={host} placeholder="Enter hostname"></Input>
                     </Form.Item>
