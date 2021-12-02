@@ -45,7 +45,7 @@ const create_monitor_view = () => {
     const router = useRouter();
     const { device_type, device_id, monitor_type } = router.query;
     const [metaData, setMetaData] = useState({});
-    const [accordion, setAccordion] = useState(5);
+    const [accordion, setAccordion] = useState(0);
     const [admins_checked, setAdmins_checked] = useState(false);
     const [device, setDevice] = useState(null);
     const [agent_id, setAgent_id] = useState(null);
