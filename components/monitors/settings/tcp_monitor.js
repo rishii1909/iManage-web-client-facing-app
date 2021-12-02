@@ -27,8 +27,8 @@ const TCPMonitorSettings = ({hostname}) => {
 
                 <Form.Item
                     name='socketTimeout'
-                    label="Port"
-                    initialValue="80"
+                    label="Socket timeout"
+                    initialValue="1000"
                     rules={[{required : true, message : "Please enter a socket timeout."}]}
                 >
                     <Input placeholder="Enter socket timeout"></Input>
