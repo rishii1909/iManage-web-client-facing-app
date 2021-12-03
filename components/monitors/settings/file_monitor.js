@@ -11,7 +11,7 @@ const FileMonitorSettings = ({hostname, device_id, device_type, form}) => {
     const [services, setServices] = useState(null);
     const [service_id, setService_id] = useState(null);
     const [agent, setAgent] = useState(null);
-    const [dir_path, setDir_path] = useState("");
+    const [dir_path, setDir_path] = useState("/");
     const [file_pattern, setFile_pattern] = useState("");
     const router = useRouter();
     useEffect(async () => {
@@ -77,20 +77,21 @@ const FileMonitorSettings = ({hostname, device_id, device_type, form}) => {
                     label="Directory path"
                     // rules={[{required : true, message : "Please enter a name for this monitor."}]}
                 >
-                    <Input defaultValue="/" value={dir_path} onChange={(val) => setDir_path(val)} ></Input>
+                    <Input value={dir_path} onChange={(e) => {setDir_path(e.target.value); form.setFieldsValue({file_path : e.target.value + file_pattern})}} ></Input>
                 </Form.Item>
                 <Form.Item
                     name='file_pattern'
                     label="File pattern"
                 >
-                    <Input placeholder="Eg, *.txt" value={file_pattern} onChange={(val) => setFile_pattern(val)} ></Input>
+                    <Input placeholder="Eg, *.txt" value={file_pattern} onChange={(e) => {setFile_pattern(e.target.value); form.setFieldsValue({file_path : dir_path + e.target.value})}} ></Input>
                 </Form.Item>
 
                 <Form.Item
                     name='file_path'
                     label="File path"
                 >
-                    <Input disabled value={dir_path + file_pattern}></Input>
+                    <Input value={dir_path + file_pattern} />
+                    <span style={{display : 'none'}}>{dir_path + file_pattern}</span>
                 </Form.Item>
                
                 <Form.Item
@@ -111,13 +112,13 @@ const FileMonitorSettings = ({hostname, device_id, device_type, form}) => {
                     name='warning_cap_file_size'
                     label="Warning file size"
                 >
-                    <InputNumber onChange={val => form.setFieldsValue({ warning_cap_file_size : val})} /> MB
+                    <InputNumber defaultValue={10} onChange={val => form.setFieldsValue({ warning_cap_file_size : val})} /> MB
                 </Form.Item>
                 <Form.Item
                     name='failure_cap_file_size'
                     label="Failure file size"
                 >
-                    <InputNumber onChange={val => form.setFieldsValue({ failure_cap_file_size : val})} /> MB
+                    <InputNumber defaultValue={50} onChange={val => form.setFieldsValue({ failure_cap_file_size : val})} /> MB
                 </Form.Item>
                 <Form.Item
                     name='failure_max_file_age'
