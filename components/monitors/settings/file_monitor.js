@@ -11,6 +11,8 @@ const FileMonitorSettings = ({hostname, device_id, device_type, form}) => {
     const [services, setServices] = useState(null);
     const [service_id, setService_id] = useState(null);
     const [agent, setAgent] = useState(null);
+    const [dir_path, setDir_path] = useState("");
+    const [file_pattern, setFile_pattern] = useState("");
     const router = useRouter();
     useEffect(async () => {
         if(device_id){
@@ -71,17 +73,24 @@ const FileMonitorSettings = ({hostname, device_id, device_type, form}) => {
 
 
                 <Form.Item
-                    name='file_path'
+                    name='dir_path'
                     label="Directory path"
                     // rules={[{required : true, message : "Please enter a name for this monitor."}]}
                 >
-                    <Input defaultValue="/"></Input>
+                    <Input defaultValue="/" value={dir_path} onChange={(val) => setDir_path(val)} ></Input>
                 </Form.Item>
                 <Form.Item
                     name='file_pattern'
                     label="File pattern"
                 >
-                    <Input placeholder="Eg, *.txt"></Input>
+                    <Input placeholder="Eg, *.txt" value={file_pattern} onChange={(val) => setFile_pattern(val)} ></Input>
+                </Form.Item>
+
+                <Form.Item
+                    name='file_path'
+                    label="File path"
+                >
+                    <Input disabled value={dir_path + file_pattern}></Input>
                 </Form.Item>
                
                 <Form.Item
