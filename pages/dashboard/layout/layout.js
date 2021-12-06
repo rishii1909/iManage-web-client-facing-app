@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Row, Col, Layout, Menu, Drawer, List, Empty, Space, Button, Tag, message, Divider } from 'antd';
 import { BellOutlined, DeleteFilled, DeleteOutlined, LogoutOutlined, ReloadOutlined, SwapRightOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons';
-import NoticeIcon from 'ant-design-pro/lib/NoticeIcon';
 import Link from 'next/link'
 import Router, { useRouter } from 'next/router';
 import { handle_error, logout, secure_axios } from '../../../helpers/auth';
