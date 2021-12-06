@@ -19,7 +19,7 @@ const device_view = () => {
     const { device_type, device_id } = router.query;
     const [device, setDevice] = useState(device_id);
     const [monitors, setMonitors] = useState(null);
-    const [modalVisible, setModalVisible] = useState(true);
+    const [modalVisible, setModalVisible] = useState(false);
     const [performanceModalVisible, setPerformanceModalVisible] = useState(false);
     const [form] = Form.useForm();
 
@@ -260,9 +260,7 @@ const device_view = () => {
                                     />
                                   </Col>
                                 </Row>
-                                {monitor.pro && 
                                     <Tag color="red">PRO</Tag>
-                                }
                               </List.Item>
                             </Link>
                             )}
