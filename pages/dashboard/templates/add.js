@@ -1,15 +1,57 @@
 import axios from "axios";
-import React, { useState, useEffect } from 'react';
-import Link from "next/link";
+import React, { useState } from 'react';
 import { useRouter } from "next/router";
 
-import { getAccessToken, handle_error, secure_axios } from "../../../helpers/auth";
+import { handle_error, secure_axios } from "../../../helpers/auth";
 import Dashboard from "../layout/layout";
-import { Menu, Tabs, List, Row, Col, Tag, Button, Divider, message, Form, Select, Input, Checkbox, Space } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Button, message, Form, Select, Input, Space, Collapse, Tabs, Table, Tag, Divider } from "antd";
 
 const { TabPane } = Tabs;
 const { Option } = Select;
+const { Panel } = Collapse;
+
+const columns = [
+    {
+        title: 'Name',
+        dataIndex: 'name',
+        key: 'name',
+        render: text => <Tag>{text}</Tag>,
+    },
+    
+    {
+        title: 'Description',
+        dataIndex: 'description',
+        key: 'description',
+        // render: text => <p>{text}</p>,
+    },
+]
+
+const vars = [
+    {
+        key : "<%Monitor%>",
+        name : "<%Monitor%>",
+        description : "Name of the monitor.",
+    },
+    {
+        key : "<%Status%>",
+        name : "<%Status%>",
+        description : "Current status detected by the monitor.",
+    },
+    {
+        key : "<%EventDT%>",
+        name : "<%EventDT%>",
+        description : "Date and time of the notification alert trigger event.",
+    },
+    {
+        key : "<%EventMessage%>",
+        name : "<%EventMessage%>",
+        description : "Event verbose message",
+    },
+
+    
+
+]
+
 
 const AddTemplateIndex = () => {
 
@@ -54,7 +96,14 @@ const AddTemplateIndex = () => {
     <Dashboard>
       <Tabs>
         
-        <TabPane tab='Notification Templates agents'>
+        <TabPane tab='Add a Notification Template'>
+
+        <Collapse>
+            <Panel header="Variables">
+            <Table pagination={false} columns={columns} dataSource={vars} />
+            </Panel>
+        </Collapse>
+        <Divider/>
         <Form
                 form={form}
                 preserve={false}
@@ -72,36 +121,7 @@ const AddTemplateIndex = () => {
                     flexFlow : 'column'
                 }}
             >
-        <Form.Item 
-                name='category'
-                label='Template Type'
-                rules={[{required : true, message : "Please select a template type."}]}
-            >
-                <Select 
-                    placeholder="Select template type"
-                >
-                    <Option 
-                        value="<%Monitor%>"
-                    > 
-                    {"<%Monitor%>"}
-                    </Option>
-                    <Option 
-                        value="<%Status%>"
-                    > 
-                    {"<%Status%>"}
-                    </Option>
-                    <Option 
-                        value="<%EventDT%>"
-                    > 
-                    {"<%EventDT%>"}
-                    </Option>
-                    <Option 
-                        value="<%EventMessage%>"
-                    > 
-                    {"<%EventMessage%>"}
-                    </Option>
-                </Select>
-            </Form.Item>
+        
             <Form.Item
                 name='name'
                 label='Name'
