@@ -71,7 +71,7 @@ const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallb
                     label="Monitor logging interval"
                     initialValue={10}
                 >
-                    <InputNumber defaultValue={10} /> Minutes
+                    <InputNumber defaultValue={60} /> Seconds
                 </Form.Item>
                 <Form.Item
                     name="offline_time_1"

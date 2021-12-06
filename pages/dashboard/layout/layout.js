@@ -161,7 +161,7 @@ export default function dashboard({ domain, subdomain, children }){
             </Layout>
             <Drawer 
               title="My Notifications" 
-              width={420} 
+              width={595} 
               placement="right" 
               onClose={() => setNotificationDrawer(false)} 
               visible={notificationDrawer}
@@ -171,10 +171,18 @@ export default function dashboard({ domain, subdomain, children }){
               {notifs.map(n => {
                 return (
                   <List.Item>
-                    <List.Item.Meta title={n.header} description={n.body} />
-                    <div style={{display : 'flex', flexFlow : 'row', alignItems : 'right'}}>
-                      <Notifooter n={n}></Notifooter>
+                    {/* <List.Item.Meta title={n.header} description={n.body} /> */}
+                    
+                    <div style={{display : 'flex', flexFlow : 'row', justifyContent : 'space-between'}}>
+                      <div style={{display : 'flex', alignItems : 'center', justifyContent : 'center'}}><Notifooter n={n}></Notifooter></div>
+                      <div style={{paddingLeft : '0.6em'}}>
+                      <div style={{fontSize : '1.2em', marginBottom : "0.8em !important" }}>{n.header}</div>
+                      <div style={{color : "gray"}}>{n.body.split('\n').map(i => {
+                        return <p style={{marginBottom : '0.2em'}}>{i}</p>
+                      })}</div>
+                      </div>
                     </div>
+                    
                   </List.Item>
                 )
               })}

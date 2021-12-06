@@ -34,9 +34,12 @@ const NotificationTemplatePanel = () => {
                                 <Form.Item
                                     name='notification_template'
                                     label='Choose a template'
+                                    initialValue={templates[0] ? templates[0]._id : null}
+                                    required={true}
                                 >
                                     <Select 
                                         placeholder={`Select Notification Template`}
+                                        
                                     >
                                         {templates.map((el)=>{
                                             return <Option value={el._id} key={el._id}><div>{el.name} | <span style={{fontSize : "0.8em", color : "gray"}}>{el.header}</span></div></Option>
