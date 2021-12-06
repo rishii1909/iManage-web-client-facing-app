@@ -20,26 +20,24 @@ import dynamic from 'next/dynamic'
 import AssignAdminsPanel from "../../../../../../components/monitors/AssignAdmins";
 
 var valid_monitors = [
-  "uptime_monitor",
-  "url_monitor",
-  "tcp_monitor",
-  "cpu_monitor",
-  "disk_monitor",
-  "file_monitor",
-  "service_monitor",
-  "snmp_monitor",
+    "uptime_monitor",
+    "url_monitor",
+    "tcp_monitor",
+    "cpu_monitor",
+    "disk_monitor",
+    "file_monitor",
+    "service_monitor",
+    "snmp_monitor",
+    "cron_monitor",
+    "inode_monitor",
+    "load_monitor",
+    "swap_monitor",
 ]
-
 
 
 const { Panel } = Collapse;
 const { TabPane } = Tabs;
 
-const dummy_admins = [
-    {name : "Admin 1"},
-    {name : "Admin 2"},
-    {name : "Admin 3"},
-]
 
 const create_monitor_view = () => {
     const router = useRouter();
@@ -59,7 +57,6 @@ const create_monitor_view = () => {
         }
     }
     useEffect(async () => {
-        console.log(device_id)
         if(device_id){
             console.log('here')
             secure_axios(

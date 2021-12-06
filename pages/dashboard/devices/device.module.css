@@ -7,6 +7,13 @@
     transition: 0.3s;
 }
 
-.device-list-item:not(:last-child){
-    border-bottom: 1px solid rgba(211, 211, 211) !important;
+/* .device-list-item:not(:last-child){ */
+.device-list-item{
+    border-top: 1px solid rgba(83, 83, 83, 0.397) !important;
+    /* border-bottom: 1px solid rgba(83, 83, 83, 0.397) !important; */
+}
+
+.scrollable-list{
+    max-height: 420px !important;
+    overflow-y: scroll;
 }

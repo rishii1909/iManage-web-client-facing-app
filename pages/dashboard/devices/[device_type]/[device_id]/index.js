@@ -19,7 +19,8 @@ const device_view = () => {
     const { device_type, device_id } = router.query;
     const [device, setDevice] = useState(device_id);
     const [monitors, setMonitors] = useState(null);
-    const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisible, setModalVisible] = useState(true);
+    const [performanceModalVisible, setPerformanceModalVisible] = useState(false);
     const [form] = Form.useForm();
 
     useEffect(async () => {
@@ -210,6 +211,7 @@ const device_view = () => {
                     >
                     <List
                       itemLayout="horizontal"
+                      className={styles['scrollable-list']}
                       dataSource={create_monitor_types}
                       renderItem={monitor => (
                         <Link href={`/dashboard/devices/${device_type}/${device_id}/add/${monitor.key}`} key={monitor.key}>
@@ -227,7 +229,47 @@ const device_view = () => {
                           </List.Item>
                         </Link>
                         )}
-                    />
+                    >
+                        <List.Item onClick={() => setPerformanceModalVisible(true)} className={styles['device-list-item']} >
+                            <Row style={{width : "100%"}} >
+                              <Col span={16}>
+                                <List.Item.Meta
+                                  title="Performance monitor"
+                                />
+                              </Col>
+                            </Row>
+                            <Tag color="red">PRO</Tag>
+                        </List.Item>
+                        <Modal
+                            title="Add a Performance monitor"
+                            visible={performanceModalVisible}
+                            onok={() => setPerformanceModalVisible(false)}
+                            onCancel={() => setPerformanceModalVisible(false)}
+                        >
+                        <List
+                          itemLayout="horizontal"
+                          className={styles['scrollable-list']}
+                          dataSource={performance_monitor_types}
+                          renderItem={monitor => (
+                            <Link href={`/dashboard/devices/${device_type}/${device_id}/add/${monitor.key}`} key={monitor.key}>
+                              <List.Item className={styles['device-list-item']} >
+                                <Row style={{width : "100%"}} >
+                                  <Col span={16}>
+                                    <List.Item.Meta
+                                      title={monitor.name}
+                                    />
+                                  </Col>
+                                </Row>
+                                {monitor.pro && 
+                                    <Tag color="red">PRO</Tag>
+                                }
+                              </List.Item>
+                            </Link>
+                            )}
+                        ></List>
+
+                        </Modal>
+                    </List>
                     </Modal>
                 </TabPane>
 
@@ -436,7 +478,7 @@ const device_view = () => {
             
         </Device_dashboard>
     )
-}   
+}
 
 const create_monitor_types = [
     {
@@ -475,7 +517,26 @@ const create_monitor_types = [
         key : "snmp_monitor",
         name : "SNMP monitor"
     },
-  ]
+]
+const performance_monitor_types = [
+    {
+        key : "cron_monitor",
+        name : "Cron Job monitor"
+    },
+    {
+        key : "inode_monitor",
+        name : "Inode monitor"
+    },
+    {
+        key : "load_monitor",
+        name : "Load monitor"
+    },
+    {
+        key : "swap_monitor",
+        name : "Swap monitor",
+        pro : true
+    },
+]
 
 
 export default device_view

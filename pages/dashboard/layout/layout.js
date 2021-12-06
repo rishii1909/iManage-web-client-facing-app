@@ -15,10 +15,10 @@ export default function dashboard({ domain, subdomain, children }){
   const [notificationDrawer, setNotificationDrawer] = useState(false);
   const [notifs, setNotifs] = useState([]);
   const [notifsLoading, setNotifsLoading] = useState(false);
-  function stats(num){
+  function stats(num, is_binary){
     switch (num) {
       case 1:
-        return "Warning"
+        return is_binary ? "Failure" : "Warning"
         break;
       case 2: 
       return "Failure"
@@ -38,7 +38,7 @@ export default function dashboard({ domain, subdomain, children }){
     // }
     if(c == 0) return "green"
     if(c == 1){
-      return b ?  "red" : "yellow" 
+      return b ? "red" : "yellow" 
     }
     if(c == 2) return "red"
   }
@@ -53,9 +53,7 @@ export default function dashboard({ domain, subdomain, children }){
     }else{
       return (
         <Tag>
-        {stats(n.previous_monitor_status)}
-        <SwapRightOutlined style={{display : "inline-block"}}/>
-        {stats(n.current_monitor_status)}
+        {stats(n.previous_monitor_status)} <SwapRightOutlined style={{display : "inline-block"}}/> {stats(n.current_monitor_status)}
         </Tag>
       )
     }
@@ -71,6 +69,7 @@ export default function dashboard({ domain, subdomain, children }){
     secure_axios('/notifications/enumerate', {}, router, (r) => {
       setNotifsLoading(false)
       if(r.accomplished){
+        console.log(r.response.notifications)
         setNotifs(r.response.notifications)
       }else{
         handle_error(r);
