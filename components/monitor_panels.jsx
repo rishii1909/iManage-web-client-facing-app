@@ -5,11 +5,13 @@ import{ useState, useEffect } from 'react';
 import { useRouter } from "next/router";
 
 
-const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallback }) => {
+const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallback, agent }) => {
     const router = useRouter();
     const [teamAgents, setTeamAgents] = useState(null);
     useEffect(() => {
-        secure_axios(
+        console.log(agent)
+        if(!agent){
+            secure_axios(
             "/agents/enumerate/" + device_type,
             {},
             router,
@@ -23,13 +25,14 @@ const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallb
               }
             }
             )
-    }, []);
+        }
+    }, [agent]);
 
 
     return (
             <>
                 
-                {teamAgents && 
+                {teamAgents && !agent && 
                     <Form.Item
                     name='agent_id'
                     labelCol={{span: 5}}
@@ -45,6 +48,25 @@ const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallb
                             {teamAgents && teamAgents.map((el)=>{
                                 return <Option value={el._id} key={el._id}><div>{el.name} | <span style={{fontSize : "0.8em", color : "gray"}}>{el.api_url}</span></div></Option>
                             })}
+                        </Select>
+                    </Form.Item>
+                }
+                {agent && 
+                    <Form.Item
+                    name='null_agent'
+                    labelCol={{span: 5}}
+                    label='Agent'
+                    initialValue={teamAgents[0] ? teamAgents[0]._id : null}
+                    >
+                        <Select 
+                            placeholder={`Select ${device_type} agent`}
+                            onChange={val => agentCallback(val)}
+                            defaultValue
+                            disabled
+                        >
+                            {agent && 
+                                <Option value={agent._id} key={agent._id}><div>{agent.name} | <span style={{fontSize : "0.8em", color : "gray"}}>{agent.api_url}</span></div></Option>
+                            }
                         </Select>
                     </Form.Item>
                 }
@@ -69,7 +91,7 @@ const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallb
                 <Form.Item
                     name="pingInterval"
                     label="Monitor logging interval"
-                    initialValue={10}
+                    initialValue={60}
                 >
                     <InputNumber defaultValue={60} /> Seconds
                 </Form.Item>
