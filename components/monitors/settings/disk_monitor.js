@@ -118,7 +118,7 @@ const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id, form}) 
                     onChange={val => form.setFieldsValue({ warning_cap : val })}
                     placeholder="Free space"
                     defaultValue={500}
-                    /> MB free space
+                    /> KB free space
                 </Form.Item>
 
                 <Form.Item
@@ -133,7 +133,7 @@ const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id, form}) 
                     placeholder="Free space"
                     defaultValue={50}
                     onChange={val => form.setFieldsValue({ failure_cap : val })}
-                    /> MB free space
+                    /> KB free space
                 </Form.Item>
 
                 

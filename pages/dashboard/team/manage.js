@@ -94,7 +94,7 @@ const device_add = () => {
                     <Option 
                         value="3"
                     > 
-                    Cisco Router
+                    Network Device
                     </Option>
                 </Select>
             </Form.Item>

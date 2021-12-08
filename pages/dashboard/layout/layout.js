@@ -166,7 +166,7 @@ export default function dashboard({ domain, subdomain, children }){
               onClose={() => setNotificationDrawer(false)} 
               visible={notificationDrawer}
               >
-                <Button style={{position : "absolute", right : '2em', bottom : '2em'}} onClick={clearNotifications} type="primary" icon={<DeleteOutlined/>}>Clear notifications</Button>
+                <Button style={{position : "absolute", right : '2em', bottom : '2em', zIndex : '99999'}} onClick={clearNotifications} type="primary" icon={<DeleteOutlined/>}>Clear notifications</Button>
               <List>
               {notifs.map(n => {
                 return (

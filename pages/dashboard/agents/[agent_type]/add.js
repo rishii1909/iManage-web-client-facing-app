@@ -141,7 +141,7 @@ const agent_add = () => {
                     <Option 
                         value="2"
                     > 
-                    Cisco Router
+                    Network Device
                     </Option>
                 </Select>
             </Form.Item>

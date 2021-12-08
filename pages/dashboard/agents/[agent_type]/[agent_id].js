@@ -167,7 +167,7 @@ const agent_view = () => {
                     <Option 
                         value="2"
                     > 
-                    Cisco Router
+                    Network Device
                     </Option>
                 </Select>
             </Form.Item>

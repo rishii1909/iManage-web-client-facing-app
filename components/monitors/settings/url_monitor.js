@@ -30,13 +30,13 @@ const UrlMonitorSettings = () => {
                 </Form.Item>
 
                 <Form.Item
-                    name='content_failure'
+                    name='failure_content'
                     label="Failure Content"
                 >
                     <TextArea name="content_failure" placeholder="Fail if content not found" ></TextArea>
                 </Form.Item>
                 <Form.Item
-                    name='content_warning'
+                    name='warning_content'
                     label="Warning Content"
                 >
                     <TextArea name="content_warning" placeholder="Warn if content not found" ></TextArea>
