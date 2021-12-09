@@ -154,6 +154,7 @@ export default function dashboard({ domain, subdomain, children }){
                 style={{
                   margin: '0px ',
                   minHeight: 280,
+                  paddingBottom : '120px'
                 }}
               >
                 {children}
