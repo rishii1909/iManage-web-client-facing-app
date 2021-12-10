@@ -47,12 +47,12 @@ export default function dashboard({ domain, subdomain, children }){
     if(n.isBinary && n.current_monitor_status) n.current_monitor_status++;
     if(n.previous_monitor_status == n.current_monitor_status){
       return (
-        <Tag color={tagColor(n.current_monitor_status, n.previous_monitor_status, n.isBinary)}>{stats(n.current_monitor_status)}</Tag>
+        <Tag color={tagColor(n.current_monitor_status, n.previous_monitor_status, n.is_binary)}>{stats(n.current_monitor_status, n.is_binary)}</Tag>
       )
     }else{
       return (
         <Tag>
-        {stats(n.previous_monitor_status)} <SwapRightOutlined style={{display : "inline-block"}}/> {stats(n.current_monitor_status)}
+        {stats(n.previous_monitor_status, n.is_binary)} <SwapRightOutlined style={{display : "inline-block"}}/> {stats(n.current_monitor_status, n.is_binary)}
         </Tag>
       )
     }
