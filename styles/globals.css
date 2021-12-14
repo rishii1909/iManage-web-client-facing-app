@@ -41,3 +41,9 @@ a {
   border-bottom: 1px solid rgba(211, 211, 211, 0.644) !important;
   /* border-top: 1px solid rgba(211, 211, 211, 0.644) !important; */
 }
+
+.slick-next, .slick-prev {
+  color: black !important ;
+  
+
+}

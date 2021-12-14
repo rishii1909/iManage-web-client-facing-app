@@ -1,23 +1,24 @@
 import { Form, Button, message, Select, Breadcrumb, Tabs, List, Switch, Divider } from "antd"
 
 const { Option } = Select;
-import Device_dashboard from "../../../Device_dashboard"
+import Device_dashboard from "../../../../Device_dashboard"
 import { useState, useEffect } from 'react';
-import { handle_error, secure_axios } from '../../../../../../helpers/auth'
+import { handle_error, secure_axios } from '../../../../../../../helpers/auth'
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { snmp, types } from "../../../../../../helpers/devices/dict";
+import { snmp, types } from "../../../../../../../helpers/devices/dict";
 import BreadcrumbItem from "antd/lib/breadcrumb/BreadcrumbItem";
-import { capitalizeFirstLetter, monitor_types } from "../../../../../../helpers/format";
+import { capitalizeFirstLetter, monitor_types } from "../../../../../../../helpers/format";
 import { DownOutlined, PlusCircleFilled, PlusOutlined, PlusSquareFilled, UpOutlined } from "@ant-design/icons";
-import DetailsPanel from "../../../../../../components/monitor_panels";
+import DetailsPanel from "../../../../../../../components/monitor_panels";
 import { Collapse } from 'antd';
-import RightAlignedButtonWrapper from "../../../../../../components/ui/RetentionSchedulePanel";
-import RetentionSchedulePanel from "../../../../../../components/monitors/RetentionSchedulePanel";
-import NotificationRulesPanel from "../../../../../../components/monitors/NotificationRules";
-import NotificationTemplatePanel from "../../../../../../components/monitors/NotificationTemplate";
+import RightAlignedButtonWrapper from "../../../../../../../components/ui/RetentionSchedulePanel";
+import RetentionSchedulePanel from "../../../../../../../components/monitors/RetentionSchedulePanel";
+import NotificationRulesPanel from "../../../../../../../components/monitors/NotificationRules";
+import NotificationTemplatePanel from "../../../../../../../components/monitors/NotificationTemplate";
 import dynamic from 'next/dynamic'
-import AssignAdminsPanel from "../../../../../../components/monitors/AssignAdmins";
+import AssignAdminsPanel from "../../../../../../../components/monitors/AssignAdmins";
+import { Line } from "@ant-design/charts";
 
 var valid_monitors = [
     "uptime_monitor",
@@ -41,42 +42,68 @@ const { TabPane } = Tabs;
 
 const create_monitor_view = () => {
     const router = useRouter();
-    const { device_type, device_id, monitor_type } = router.query;
+    const { device_type, device_id, monitor_type, monitor_id } = router.query;
     const [metaData, setMetaData] = useState({});
-    const [accordion, setAccordion] = useState(0);
+    const [accordion, setAccordion] = useState([0,1,2,3,4,5]);
     const [admins_checked, setAdmins_checked] = useState(false);
     const [device, setDevice] = useState(null);
     const [agent_id, setAgent_id] = useState(null);
+    const [monitor, setMonitor] = useState(null);
+    const [template, setTemplate] = useState(null);
+    const [agent, setAgent] = useState(null);
     const [form] = Form.useForm();
 
-    if(typeof window !== 'undefined'){
+    if(typeof window !== 'undefined' && monitor_type){
         if(valid_monitors.includes(monitor_type)){
-            var MonitorSettingsPanel = dynamic(() => import(`../../../../../../components/monitors/settings/${monitor_type}`))
+            var MonitorSettingsPanel = dynamic(() => import(`../../../../../../../components/monitors/settings/${monitor_type}`))
+            var MonitorAggregatesPanel = dynamic(() => import(`../../../../../../../components/monitors/aggregates/${monitor_type}`))
         }else{
             if( typeof monitor_type !== 'undefined' && typeof window !== 'undefined') router.push('/404')
         }
     }
     useEffect(async () => {
-        if(device_id){
+        // if(device_id){
+        //     secure_axios(
+        //         '/devices/enumerate/device',
+        //         {device_id : device_id, show_creds : true},
+        //         router,
+        //         (r) => {
+        //             console.log(r)
+        //           if(r.accomplished){
+        //               setDevice(r.response);
+        //           }else{
+        //             message.error(r.response.message ? r.response.message : r.response )
+        //           }
+        //         }
+        //     )
+        // }
+        if(monitor_id){
             secure_axios(
-                '/devices/enumerate/device',
-                {device_id : device_id, show_creds : true},
+                '/monitors/enumerate/monitor',
+                {monitor_id},
                 router,
                 (r) => {
-                    console.log(r)
-                  if(r.accomplished){
-                      setDevice(r.response);
-                  }else{
-                    message.error(r.response.message ? r.response.message : r.response )
-                  }
+                    console.log(r);
+                    if(r.accomplished){
+                        setMonitor(r.response.monitor.response);
+                        console.log("MONITOR HERE",r.response.monitor.response)
+                        form.setFieldsValue(r.response.monitor.response);
+                        setMetaData(r.response.metadata);
+                        console.log("METADATA", r.response.metadata)
+                        form.setFieldsValue({label : r.response.metadata.label});
+                        setTemplate(r.response.notification_template);
+                        form.setFieldsValue(r.response.notification_template);
+                        setAgent(r.response.metadata.agent_id);
+                    }else{
+                        handle_error(r);
+                    }
                 }
             )
         }
-    }, [device_id]);
+    }, [monitor_id]);
 
 
     const on_finish = async (data) => {
-        console.log(data)
         let notification_rules = {};
         if(data.custom == "every"){
             notification_rules = {
@@ -182,8 +209,16 @@ const create_monitor_view = () => {
                 {/* <Breadcrumb.Item>{device && device.name ? device.name : ""}</Breadcrumb.Item> */}
             </Breadcrumb>
             
-            <Tabs>
-                <TabPane tab="Monitor" key="monitor">
+            <Tabs style={{minHeight : '100vh'}} >
+                <TabPane tab={`${monitor ? monitor.label : "Monitor"} aggregates`} >
+                    <div style={{height : '100%'}} >
+                    {
+                        MonitorAggregatesPanel &&
+                        <MonitorAggregatesPanel monitor={monitor && monitor} device_id={metaData && metaData.device_id} agent_id={agent && agent._id} />
+                    }
+                    </div>
+                </TabPane>
+                <TabPane tab="Monitor details" key="monitor_details">
                     {/* <Link href={`/dashboard/devices/${"device_type"}/${device_id}/monitors/add`}>
                       <Button type="primary" icon={<PlusOutlined/>} >
                         Add a monitor
@@ -212,12 +247,13 @@ const create_monitor_view = () => {
                     >
                         <Collapse defaultActiveKey={accordion}>
                             <Panel forceRender header="Details" key={0}>
-                                { (device_type && device) && 
+                                { (device_type) && 
                                 <DetailsPanel 
                                 device_type={device_type} 
                                 monitor_type={monitor_type ? monitor_types[monitor_type] : ""}
                                 device_name={device && device.name}
                                 agentCallback={setAgent_id}
+                                agent={agent}
                                 >
                                 </DetailsPanel> }
                                 <RightAlignedButtonWrapper>
@@ -227,7 +263,7 @@ const create_monitor_view = () => {
                             <Panel forceRender header="Settings" key={1}>
                                 {MonitorSettingsPanel && 
                                     <MonitorSettingsPanel
-                                        hostname={device ? device.host : ""}
+                                        {...((monitor && monitor.url) ? {hostname : monitor.url} : {})}
                                         device_id={device_id}
                                         device_type={device_type} 
                                         monitor_type={monitor_type ? monitor_types[monitor_type] : ""}
@@ -248,13 +284,13 @@ const create_monitor_view = () => {
                                     {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion()}>Next</Button> */}
                                 </RightAlignedButtonWrapper>
                             </Panel>
-                            <Panel forceRender header="Notification Template" key={3}>
-                                <NotificationTemplatePanel/>
+                            {/* <Panel forceRender header="Notification Template" key={3}>
+                                <NotificationTemplatePanel template_id={template && template._id} />
                                 <RightAlignedButtonWrapper>
-                                    {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(2)}>Previous</Button> */}
-                                    {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(4)}>Next</Button> */}
+                                    <Button icon={<UpOutlined/>} onClick={()=>setAccordion(2)}>Previous</Button>
+                                    <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(4)}>Next</Button>
                                 </RightAlignedButtonWrapper>
-                            </Panel>
+                            </Panel> */}
                             <Panel forceRender header="Notification Rules" key={4}>
                                 <NotificationRulesPanel form={form} />
                                 <RightAlignedButtonWrapper>
@@ -265,7 +301,7 @@ const create_monitor_view = () => {
                             <Panel forceRender header="Assign Admins" key={5}>
                                 <RightAlignedButtonWrapper>
                                     {/* <Switch checkedChildren="Assigned" unCheckedChildren="All" onChange={(e)=> setAdmins_checked(e)} checked={admins_checked}></Switch> */}
-                                </RightAlignedButtonWrapper>
+                                </RightAlignedButtonWrapper>    
 
                                 <AssignAdminsPanel form={form} />
 

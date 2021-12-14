@@ -185,7 +185,7 @@ const device_view = () => {
                       loading={monitors === null ? true : false}
                       dataSource={monitors === null ? [] : monitors}
                       renderItem={monitor => (
-                        // <Link href={`/dashboard/devices/${device_type}/${device_id}/${monitor._id}`} key={monitor.monitor_ref}>
+                        <Link href={`/dashboard/devices/${device_type}/${device_id}/view/${monitor.type}/${monitor._id}`} key={monitor.monitor_ref}>
                           <List.Item className={styles['device-list-item']} >
                             <Row style={{width : "100%"}} >
                               <Col span={16}>
@@ -197,10 +197,10 @@ const device_view = () => {
                             </Row>
                             {/* <Tag>{monitor_types[monitor.type]}</Tag> */}
                             <Tag color="blue">{monitor.monitor_ref}</Tag>
-                            <Button type='danger' icon={<DeleteFilled/>} onClick={() => delete_monitor(monitor._id, monitor.label)}>Delete</Button>
+                            <Button type='danger' icon={<DeleteFilled/>} onClick={(e) => {e.stopPropagation();delete_monitor(monitor._id, monitor.label)}}>Delete</Button>
                             {/* <Tag color={monitor.active ? "success" : "error"}>{monitor.active ? "Active" : "Inactive"}</Tag> */}
                           </List.Item>
-                        //</Link>
+                        </Link>
                         )}
                     />
                     <Modal

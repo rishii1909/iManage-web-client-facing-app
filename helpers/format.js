@@ -16,3 +16,18 @@ exports.monitor_types = {
   "cron_monitor" : "Cron monitor", // 
   "snmp_monitor" : "SNMP monitor", // 
 }
+
+exports.binary_monitors = {
+  "uptime_monitor" : true,
+  "url_monitor" : true,
+  "tcp_monitor" : true,
+  "cpu_monitor" : false,
+  "disk_monitor" : false,
+  "file_monitor" : false,
+  "service_monitor" : true,
+  "snmp_monitor" : false,
+  "inode_monitor" : false,
+  "cron_monitor" : true,
+  "load_monitor" : false,
+  "swap_monitor" : false,
+}

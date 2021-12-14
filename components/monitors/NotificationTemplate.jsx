@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 
 const { Option } = Select;
 const { TextArea } = Input;
-const NotificationTemplatePanel = () => {
+const NotificationTemplatePanel = ({template_id}) => {
     const router = useRouter();
     const [templates, setTemplates] = useState(null);
     useEffect(() => {
@@ -34,7 +34,7 @@ const NotificationTemplatePanel = () => {
                                 <Form.Item
                                     name='notification_template'
                                     label='Choose a template'
-                                    initialValue={templates[0] ? templates[0]._id : null}
+                                    initialValue={template_id ? template_id : templates[0] ? templates[0]._id : null}
                                     required={true}
                                 >
                                     <Select 
