@@ -388,13 +388,13 @@ const DashboardIndex = () => {
           <>
           <Col style={{border : `2px solid lightGray`}}>
           <div className={styles['monitor_box']} style={{backgroundColor : monitor.color_faded, borderRadius : '5px', padding : "1.6em 1.6em"}}>
-            <div style={{color : "rgba(black, 0.6)", fontWeight : "600", fontSize : '18px'}}>{monitor.label}</div>
+            <div style={{color : "rgba(black, 0.6)", fontWeight : "600", fontSize : '18px'}}>{monitor.label ? monitor.label : "iManage monitor"}</div>
             
             <Statistic
               // title={monitor.label}
               prefix={monitor.symbol}
               valueStyle={{color : monitor.color}}
-              value={"Up"}
+              value={monitor.verbose}
             />
             <br></br>
             <div style={{display : "flex", justifyContent : "flex-end"}}>
