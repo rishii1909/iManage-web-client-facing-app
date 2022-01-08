@@ -1,12 +1,21 @@
 import {Form, Slider} from "antd";
-import{ useState } from 'react';
+import{ useState, useEffect } from 'react';
 
-const RetentionSchedulePanel = () => {
+const RetentionSchedulePanel = ({retention_schedule}) => {
     
-    const [rawData, setRawData] = useState(0);
-    const [dailyAggr, setDailyAggr] = useState(0);
-    const [weeklyAggr, setWeeklyAggr] = useState(0);
-    const [monthlyAggr, setMonthlyAggr] = useState(0);
+    const [rawData, setRawData] = useState( 0 );
+    const [dailyAggr, setDailyAggr] = useState( 0 );
+    const [weeklyAggr, setWeeklyAggr] = useState( 0 );
+    const [monthlyAggr, setMonthlyAggr] = useState( 0 );
+    
+    useEffect(() => {
+        if(retention_schedule){
+            setRawData(retention_schedule.raw_data);
+            setDailyAggr(retention_schedule.daily_aggr);
+            setWeeklyAggr(retention_schedule.weekly_aggr);
+            setMonthlyAggr(retention_schedule.monthly_aggr);
+        }
+    }, [retention_schedule]);
 
     return (
             <>
@@ -16,7 +25,7 @@ const RetentionSchedulePanel = () => {
                     label={`Raw data : ${rawData} months`}
                     labelAlign="left"
                     labelCol={{span: 5}}
-                    initialValue={0}
+                    initialValue={retention_schedule ? retention_schedule.raw_data : 0}
                     // rules={[{required : true, message : "Please enter a name for this monitor."}]}
                     valuePropName="value"
                 >
@@ -32,12 +41,12 @@ const RetentionSchedulePanel = () => {
                     </div>
                 </Form.Item>
                 <Form.Item
-                    name='daily_aggregates'
+                    name='daily_aggr'
                     label={`Daily Aggregates : ${dailyAggr} months`}
                     labelAlign="left"
                     colon={false}
                     labelCol={{span: 5}}
-                    initialValue={0}
+                    initialValue={retention_schedule ? retention_schedule.daily_aggr : 0}
                     // rules={[{required : true, message : "Please enter a name for this monitor."}]}
                     valuePropName="value"
                 >
@@ -53,12 +62,12 @@ const RetentionSchedulePanel = () => {
                     </div>
                 </Form.Item>
                 <Form.Item
-                    name='weekly_aggregates'
+                    name='weekly_aggr'
                     colon={false}
                     label={`Weekly Aggregates : ${weeklyAggr} months`}
                     labelAlign="left"
                     labelCol={{span: 5}}
-                    initialValue={0}
+                    initialValue={retention_schedule ? retention_schedule.weekly_aggr : 0}
                     // rules={[{required : true, message : "Please enter a name for this monitor."}]}
                     valuePropName="value"
                 >
@@ -74,12 +83,12 @@ const RetentionSchedulePanel = () => {
                     </div>
                 </Form.Item>
                 <Form.Item
-                    name='monthly_aggregates'
+                    name='monthly_aggr'
                     colon={false}
                     label={`Monthly Aggregates : ${monthlyAggr} months`}
                     labelAlign="left"
                     labelCol={{span: 5}}
-                    initialValue={0}
+                    initialValue={retention_schedule ? retention_schedule.monthly_aggr : 0}
                     // rules={[{required : true, message : "Please enter a name for this monitor."}]}
                     valuePropName="value"
                 >

@@ -13,6 +13,7 @@ const device_types = [
 const device_add = () => {
     const router = useRouter();
     const [deviceType, setDeviceType] = useState(null);
+    const [snmp, setSnmp] = useState(false);
     useEffect(() => {
         const type = device_types.includes(router.query.type) ? router.query.type : false;
         if(!type) router.replace('/dashboard/devices');
@@ -142,6 +143,7 @@ const device_add = () => {
             >
                 <Select 
                     placeholder="SNMP protocol"
+                    onChange={(val) => setSnmp(val)}
                 >
                     <Option 
                         value="1"
@@ -165,6 +167,16 @@ const device_add = () => {
                     </Option>
                 </Select>
             </Form.Item>
+            {snmp > 0 && 
+                <Form.Item 
+                    name='community_string'
+                    label='Community String'
+                    initialValue={"public"}
+                    rules={[{required : true}]}
+                >
+                    <Input placeholder="Enter community string" ></Input>
+                </Form.Item>
+            }
             <Form.Item name='private' valuePropName="checked" wrapperCol={{offset : 9, span : 4}}>
                 <Checkbox> Private</Checkbox>
             </Form.Item>

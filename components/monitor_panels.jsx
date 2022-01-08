@@ -3,13 +3,30 @@ const { secure_axios } = require("../helpers/auth");
 const {Option} = Select;
 import{ useState, useEffect } from 'react';
 import { useRouter } from "next/router";
+import * as moment from 'moment';
 
 
-const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallback, agent }) => {
+const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallback, agent, remote_data, metadata }) => {
     const router = useRouter();
-    const [teamAgents, setTeamAgents] = useState(null);
+    const [teamAgents, setTeamAgents] = useState([]);
+    const [offline_1, setOffline_1] = useState([]);
     useEffect(() => {
-        console.log(agent)
+        if(remote_data) console.log("REMOTE DATA IN DETAILS PANEL : ", remote_data);
+        if(metadata) {
+            console.log("META DATA IN DETAILS PANEL : ", metadata)
+            const offline_times = metadata.offline_times;
+            if(offline_times){
+                console.log(offline_times)
+                if(offline_times.offline_time_1_start){
+                    const off_time_1 = offline_times.offline_time_1_start.split(' ');
+                    const date_1_start = moment({hour : parseInt(off_time_1[0]), minute : parseInt(off_time_1[1])})
+                    const date_1_end = moment({hour : parseInt(off_time_1[0])+1, minute : parseInt(off_time_1[1])+1})
+                    const off_arr_1 = [date_1_start, date_1_end];
+                    console.log(off_arr_1)
+                    setOffline_1(off_arr_1);
+                }
+            }
+        }
         if(!agent){
             secure_axios(
             "/agents/enumerate/" + device_type,
@@ -17,7 +34,8 @@ const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallb
             router,
             (response) => {
                 console.log(response)
-              if(response.accomplished){
+                if(response.accomplished){
+                  console.log("FETCHED AGENTS", response.response)
                 setTeamAgents(response.response);
                 agentCallback(response.response[0]._id)
               }else{
@@ -32,18 +50,20 @@ const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallb
     return (
             <>
                 
-                {teamAgents && !agent && 
+                {(teamAgents.length && !agent) && 
                     <Form.Item
                     name='agent_id'
                     labelCol={{span: 5}}
                     label='Agent'
+                    
                     initialValue={teamAgents[0] ? teamAgents[0]._id : null}
                     rules={[{required : true, message : "Please select an agent."}]}
                     >
                         <Select 
                             placeholder={`Select ${device_type} agent`}
                             onChange={val => agentCallback(val)}
-                            defaultValue
+                            defaultActiveFirstOption
+                            // defaultValue={ teamAgents.length ?  teamAgents[0]._id : false}
                         >
                             {teamAgents && teamAgents.map((el)=>{
                                 return <Option value={el._id} key={el._id}><div>{el.name} | <span style={{fontSize : "0.8em", color : "gray"}}>{el.api_url}</span></div></Option>
@@ -99,17 +119,19 @@ const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallb
                     name="offline_time_1"
                     labelCol={{span: 5}}
                     label="Offline time 1"
-                    format="HH:mm"
+                    // initialValue={offline_1}
+                    // format="HH:mm"
                 >
-                    <TimePicker.RangePicker/>
+                    <TimePicker.RangePicker use12Hours defaultValue={offline_1} format="hh:mm a" />
                 </Form.Item>
                 <Form.Item
                     name="offline_time_2"
                     labelCol={{span: 5}}
                     label="Offline time 2"
-                    format="HH:mm"
+                    // initialValue={remote_data && [`${remote_data.offline_times.offline_time_1_start.split(' ')[1]}:${remote_data.offline_times.offline_time_1_start.split(' ')[0]}`, `${remote_data.offline_times.offline_time_1_start.split(' ')[1]}:${remote_data.offline_times.offline_time_1_start.split(' ')[0]}`]}
+                    // format="HH:mm"
                 >
-                    <TimePicker.RangePicker/>
+                    <TimePicker.RangePicker use12Hours format="hh:mm a" />
                 </Form.Item>
                 <Form.Item
                     name="active"

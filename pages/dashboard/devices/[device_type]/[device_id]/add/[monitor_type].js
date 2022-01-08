@@ -32,6 +32,7 @@ var valid_monitors = [
     "inode_monitor",
     "load_monitor",
     "swap_monitor",
+    "sql_monitor",
 ]
 
 
@@ -76,7 +77,26 @@ const create_monitor_view = () => {
 
 
     const on_finish = async (data) => {
-        console.log(data)
+        console.log(data.offline_time_1,data.offline_time_2)
+        data.offline_times = {};
+        if(Array.isArray(data.offline_time_1)){
+            data.offline_times.offline_time_1_start = `${data.offline_time_1[0]['_d'].getMinutes()} ${data.offline_time_1[0]['_d'].getHours()} * * *`
+            data.offline_times.offline_time_1_stop = `${data.offline_time_1[1]['_d'].getMinutes()} ${data.offline_time_1[1]['_d'].getHours()} * * *`
+        }
+        if(Array.isArray(data.offline_time_2)){
+            data.offline_times.offline_time_2_start = `${data.offline_time_2[0]['_d'].getMinutes()} ${data.offline_time_2[0]['_d'].getHours()} * * *`
+            data.offline_times.offline_time_2_stop = `${data.offline_time_2[1]['_d'].getMinutes()} ${data.offline_time_2[1]['_d'].getHours()} * * *`
+        }
+
+        data.retention_schedule = {
+            raw_data : data.raw_data,
+            daily_aggr : data.daily_aggr,
+            weekly_aggr : data.weekly_aggr,
+            monthly_aggr : data.monthly_aggr,
+            retsch_export : data.retsch_export,
+        }
+
+        // return console.log(data)
         let notification_rules = {};
         if(data.custom == "every"){
             notification_rules = {
@@ -105,6 +125,7 @@ const create_monitor_view = () => {
                 }
             }
         }
+        console.log(data);
         const merged = {...data, ...(device.creds), notification_rules};
         if(data.host) merged.host = data.host;
         merged.type = monitor_type;

@@ -515,6 +515,10 @@ const create_monitor_types = [
         key : "snmp_monitor",
         name : "SNMP monitor"
     },
+    {
+        key : "sql_monitor",
+        name : "SQL monitor"
+    },
 ]
 const performance_monitor_types = [
     {

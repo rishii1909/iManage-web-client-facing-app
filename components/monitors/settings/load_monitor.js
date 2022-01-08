@@ -5,7 +5,7 @@ import { handle_error, secure_axios } from "../../../helpers/auth";
 const {Option} = Select;
 const {TextArea} = Input;
 
-const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id, form}) => {
+const LoadMonitorSettings = ({hostname, device_id, device_type, agent_id, form}) => {
     const [device, setDevice] = useState(null);
     const [agent, setAgent] = useState(null);
     const [inode, setInode] = useState(null);
@@ -115,4 +115,4 @@ const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id, form}) 
     )
 }
 
-export default CPUMonitorSettings;
+export default LoadMonitorSettings;

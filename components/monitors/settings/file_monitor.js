@@ -141,6 +141,7 @@ const FileMonitorSettings = ({hostname, device_id, device_type, form}) => {
                     <Select style={{width : "120px", margin : '4px'}} placeholder="Type" defaultActiveFirstOption>
                         <Option value="modified">modified</Option>
                         <Option value="created">created</Option>
+                        <Option value="accessed">accessed</Option>
                     </Select>
                     of
                     <Select style={{width : "120px", margin : '4px'}} placeholder="Type" defaultActiveFirstOption>

@@ -1,118 +1,442 @@
-import {Form, Input, message, Select, Button, Tag, Checkbox, InputNumber, InfoCircleOutlined} from "antd";
+import { Line } from "@ant-design/charts";
+import {Carousel, Checkbox, DatePicker, Select, Switch} from "antd";
 import { useRouter } from "next/router";
 import{ useState, useEffect } from 'react';
 import { handle_error, secure_axios } from "../../../helpers/auth";
+import RightAlignedButtonWrapper from "../../ui/RetentionSchedulePanel";
+
+const { RangePicker } = DatePicker;
+
+
 const {Option} = Select;
-const {TextArea} = Input;
+const dates_dict = {
+    "24h" : 1,
+    "3d" : 3,
+    "7d" : 7,
+}
+const makeDate = (option) => {
+    const dt = new Date();
+    dt.setDate(dt.getDate() - dates_dict[option]);
+    return dt.toUTCString();
+}
 
-const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id, form}) => {
-    const [device, setDevice] = useState(null);
-    const [agent, setAgent] = useState(null);
-    const [inode, setInode] = useState(null);
-    const [inodes, setInodes] = useState(null);
+const contentStyle = {
+    padding : '2em !important',
+  };
+
+const LoadAggregates = ({monitor, device_id, agent_id}) => {
+
     const router = useRouter();
+    const [device, setDevice] = useState(null);
+    const [autoPlay, setAutoPlay] = useState(true);
 
-    useEffect(async () => {
-        if(device_id){
+    const [hourly, setHourly] = useState([]);
+    const [customHourly, setCustomHourly] = useState(true);
+    const [hourlyLoading, setHourlyLoading] = useState(false);
+
+    const [daily, setDaily] = useState([]);
+    const [customDaily, setCustomDaily] = useState(false);
+    const [dailyLoading, setDailyLoading] = useState(false);
+
+    const [weekly, setWeekly] = useState([]);
+    const [customWeekly, setCustomWeekly] = useState(false);
+    const [weeklyLoading, setWeeklyLoading] = useState(false);
+
+    const [monthly, setMonthly] = useState([]);
+    const [customMonthly, setCustomMonthly] = useState(false);
+    const [monthlyLoading, setMonthlyLoading] = useState(false);
+
+    useEffect(() => {
+        
+        if(device_id && monitor){
             secure_axios(
                 "/devices/enumerate/device",
                 {device_id : device_id, show_creds : true},
                 router,
                 (response) => {
+                    console.log(response);
                     if(response.accomplished){
                         setDevice(response.response);
-                        fetchInodes(response.response, agent_id)
+                        const dt = new Date();
+                        dt.setDate(dt.getDate() - 1);
+                        fetchHourlyMonitors(response.response, agent_id, false, dt.toUTCString() )
+                        fetchDailyMonitors(response.response, agent_id, false, dt.toUTCString() )
+                        fetchWeeklyMonitors(response.response, agent_id, false, dt.toUTCString() )
+                        fetchMonthlyMonitors(response.response, agent_id, false, dt.toUTCString() )
                     }
                 }
             )
         }
-    }, [device_id, agent_id]);
+    }, [device_id, agent_id, monitor]);
 
-    function fetchInodes(device, agent_id){
-        if(device && agent_id){
+    
+    function fetchHourlyMonitors(device, agent_id, before, after){
+        setHourlyLoading(true);
+        if(device && agent_id && monitor){
+            if(before){
+                if(dates_dict.hasOwnProperty(before)) before = makeDate(before)
+                else before = (new Date(before)).toUTCString()
+            };
+            if(after){
+                if(dates_dict.hasOwnProperty(after)) after = makeDate(after)
+                else after = (new Date(after)).toUTCString()
+            }
             secure_axios(
                 '/monitors/remote',
                 {
                     ...{
-                        api_path : '/api/inode_monitor/fetch/enumerate',
+                        api_path : '/api/load_monitor/fetch/trends/hourly',
                         api_method : 'post',
+                        monitor_ref : monitor.agent_id,
                         agent_id : agent_id,
+                        ...(before) && {before : before},
+                        ...(after) && {after : after},
                     },
                     ...device.creds
                 },
                 router,
                 (response) => {
-                    console.log(response)
+                    console.log("HOURLY MONITORS ", response)
+
                     if(response.accomplished){
-                        setInodes(response.response.enumerate);
+                        const stats = response.response;
+                        setHourly(stats);
                     }else{
                         handle_error(response);
                     }
+                    setHourlyLoading(false);
                 }
             )
         }
     }
 
+    function fetchDailyMonitors(device, agent_id, before, after){
+        setDailyLoading(true);
+        if(device && agent_id && monitor){
+            if(before){
+                if(dates_dict.hasOwnProperty(before)) before = makeDate(before)
+                else before = (new Date(before)).toUTCString()
+            };
+            if(after){
+                if(dates_dict.hasOwnProperty(after)) after = makeDate(after)
+                else after = (new Date(after)).toUTCString()
+            }
+            secure_axios(
+                '/monitors/remote',
+                {
+                    ...{
+                        api_path : '/api/load_monitor/fetch/trends/daily',
+                        api_method : 'post',
+                        monitor_ref : monitor.agent_id,
+                        agent_id : agent_id,
+                        ...(before) && {before : before},
+                        ...(after) && {after : after},
+                    },
+                    ...device.creds
+                },
+                router,
+                (response) => {
+                    console.log("DAILY MONITORS ", response)
+
+                    if(response.accomplished){
+                        const stats = response.response;
+                        setDaily(stats);
+                    }else{
+                        handle_error(response);
+                    }
+                    setDailyLoading(false);
+                }
+            )
+        }
+    }
+
+    function fetchWeeklyMonitors(device, agent_id, before, after){
+        setWeeklyLoading(true);
+        if(device && agent_id && monitor){
+            if(before){
+                if(dates_dict.hasOwnProperty(before)) before = makeDate(before)
+                else before = (new Date(before)).toUTCString()
+            };
+            if(after){
+                if(dates_dict.hasOwnProperty(after)) after = makeDate(after)
+                else after = (new Date(after)).toUTCString()
+            }
+            secure_axios(
+                '/monitors/remote',
+                {
+                    ...{
+                        api_path : '/api/load_monitor/fetch/trends/hourly',
+                        api_method : 'post',
+                        monitor_ref : monitor.agent_id,
+                        agent_id : agent_id,
+                        ...(before) && {before : before},
+                        ...(after) && {after : after},
+                    },
+                    ...device.creds
+                },
+                router,
+                (response) => {
+                    console.log("WEEKLY MONITORS ", response)
+
+                    if(response.accomplished){
+                        const stats = response.response;
+                        setWeekly(stats);
+                    }else{
+                        handle_error(response);
+                    }
+                    setWeeklyLoading(false);
+                }
+            )
+        }
+    }
+    function fetchMonthlyMonitors(device, agent_id, before, after){
+        setMonthlyLoading(true);
+        if(device && agent_id && monitor){
+            if(before){
+                if(dates_dict.hasOwnProperty(before)) before = makeDate(before)
+                else before = (new Date(before)).toUTCString()
+            };
+            if(after){
+                if(dates_dict.hasOwnProperty(after)) after = makeDate(after)
+                else after = (new Date(after)).toUTCString()
+            }
+            secure_axios(
+                '/monitors/remote',
+                {
+                    ...{
+                        api_path : '/api/load_monitor/fetch/trends/hourly',
+                        api_method : 'post',
+                        monitor_ref : monitor.agent_id,
+                        agent_id : agent_id,
+                        ...(before) && {before : before},
+                        ...(after) && {after : after},
+                    },
+                    ...device.creds
+                },
+                router,
+                (response) => {
+                    console.log("WEEKLY MONITORS ", response)
+
+                    if(response.accomplished){
+                        const stats = response.response;
+                        setMonthly(stats);
+                    }else{
+                        handle_error(response);
+                    }
+                    setMonthlyLoading(false);
+                }
+            )
+        }
+    }
+
+    let chartConfig = {
+        padding : 'auto',
+        xField : 'logged_at',
+        yField : 'loadAvg_for_1min_avg',
+        xAxis : {
+            type : 'time',
+        },
+        yAxis : {
+            // smooth: true,
+            animation: {
+              appear: {
+                animation: 'path-in',
+                duration: 1500,
+              },
+            },
+        },
+        annotations : [
+            {
+                type : "regionFilter",
+                start : ['min', monitor ? monitor.warning_cap : 'median'],
+                end : ['max', monitor ? monitor.failure_cap : 'median'],
+                color : "#ffcc00",
+            },
+            {
+                type: 'text',
+                position: ['min', `${monitor ? monitor.warning_cap : 0}`],
+                content: 'Warning threshold',
+                offsetY: -4,
+                style: {
+                  textBaseline: 'bottom',
+                },
+            },
+            {
+                type: 'text',
+                position: ['min', `${monitor ? monitor.failure_cap : 0}`],
+                content: 'Failure threshold',
+                offsetY: -4,
+                style: {
+                  textBaseline: 'bottom',
+                },
+            },
+            {
+                type: 'line',
+                start : ['min', monitor ? monitor.warning_cap : 'median'],
+                end : ['max', monitor ? monitor.warning_cap : 'median'],
+                style: {
+                  stroke: '#cca300',
+                  lineDash: [5, 5],
+                },
+            },  
+            {
+                type: 'line',
+                start : ['min', monitor ? monitor.failure_cap : 'median'],
+                end : ['max', monitor ? monitor.failure_cap : 'median'],
+                style: {
+                  stroke: '#cc3300',
+                  lineDash: [5, 5],
+                },
+            },
+            {
+                type : "regionFilter",
+                start : ['min', 0],
+                end : ['max', monitor ? monitor.warning_cap : 'median'],
+                color : "#339900",
+            },
+            {
+                type : "regionFilter",
+                start : ['min', monitor ? monitor.failure_cap : 'median'],
+                end : ['max', 'max'],
+                color : "#339900",
+            }
+        ],
+        color : ['#339900', '#ffcc00', '#cc3300'],
+        interactions: [{ type: 'element-active' }],
+    }
+
     return (
-            <>
+            <>  
+                <RightAlignedButtonWrapper>
+                    Autoplay <Switch checked={autoPlay} onChange={val => setAutoPlay(val)} />
+                </RightAlignedButtonWrapper>
+                <Carousel  autoplay={autoPlay}>
+                    <div style={contentStyle}>
+                        <h2>Hourly Aggregates</h2>
+                        <RightAlignedButtonWrapper style={{marginBottom : '20px'}}>
+                        <Checkbox checked={customHourly} onChange={e => setCustomHourly(e.target.checked)} >Custom range</Checkbox>
+                        </RightAlignedButtonWrapper>
+                        {customHourly ? 
+                            <RightAlignedButtonWrapper>
+                                <RangePicker onChange={(date_objects, dates) => fetchHourlyMonitors(device, agent_id, dates[1], dates[0])} />
+                            </RightAlignedButtonWrapper>
+                            :
+                            <RightAlignedButtonWrapper>
+                                Viewing now : 
+                                <Select
+                                    defaultValue="24h"
+                                    onChange={val => fetchHourlyMonitors(device, agent_id, false, val)}
+                                >
+                                    <Option value='24h'>Last 24 hours</Option>
+                                    <Option value='3d'>Last 3 days</Option>
+                                    <Option value='7d'>Last 7 days</Option>
+                                </Select>
+                            </RightAlignedButtonWrapper>
+                        }
+                        
+                        {!hourlyLoading && 
+                            <Line
+                            {...chartConfig}
+                            data={hourly}
+                            />
+                        }
+                    </div>
+                    <div style={contentStyle}>
+                        <h2>Daily Aggregates</h2>
+                        <RightAlignedButtonWrapper style={{marginBottom : '20px'}}>
+                        <Checkbox checked={customDaily} onChange={e => setCustomDaily(e.target.checked)} >Custom range</Checkbox>
+                        </RightAlignedButtonWrapper>
+                        {customDaily ? 
+                            <RightAlignedButtonWrapper>
+                                <RangePicker onChange={(date_objects, dates) => fetchDailyMonitors(device, agent_id, dates[1], dates[0])} />
+                            </RightAlignedButtonWrapper>
+                            :
+                            <RightAlignedButtonWrapper>
+                                Viewing now : 
+                                <Select
+                                    defaultValue="24h"
+                                    onChange={val => fetchDailyMonitors(device, agent_id, false, val)}
+                                >
+                                    <Option value='24h'>Last 24 hours</Option>
+                                    <Option value='3d'>Last 3 days</Option>
+                                    <Option value='7d'>Last 7 days</Option>
+                                </Select>
+                            </RightAlignedButtonWrapper>
+                        }
 
-                {/* <Form.Item
-                    name='agent_id'
-                    labelCol={{span: 5}}
-                    label='Agent'
-                    rules={[{required : true, message : "Please select an agent."}]}
-                >
-                    <Select 
-                        placeholder={`Select ${device_type} agent`}
-                        onChange={(val) => {setAgent(val); fetchCronUsers(val)}}
-                    >
-                        {teamAgents && teamAgents.map((el)=>{
-                            return <Option value={el._id} key={el._id}><div>{el.name} | <span style={{fontSize : "0.8em", color : "gray"}}>{el.api_url}</span></div></Option>
-                        })}
-                    </Select>
-                    
-                    <Button onClick={()=>fetchCronUsers(agent)}>Retry</Button>
-                </Form.Item> */}
+                        {!dailyLoading && 
+                            <Line
+                            {...chartConfig}
+                            data={daily}
+                            />
+                        }
+                    </div>
+                    <div style={contentStyle}>
+                        <h2>Weekly Aggregates</h2>
+                        <RightAlignedButtonWrapper style={{marginBottom : '20px'}}>
+                        <Checkbox checked={customWeekly} onChange={e => setCustomWeekly(e.target.checked)} >Custom range</Checkbox>
+                        </RightAlignedButtonWrapper>
+                        {customWeekly ? 
+                            <RightAlignedButtonWrapper>
+                                <RangePicker onChange={(date_objects, dates) => fetchWeeklyMonitors(device, agent_id, dates[1], dates[0])} />
+                            </RightAlignedButtonWrapper>
+                            :
+                            <RightAlignedButtonWrapper>
+                                Viewing now : 
+                                <Select
+                                    defaultValue="24h"
+                                    onChange={val => fetchWeeklyMonitors(device, agent_id, false, val)}
+                                >
+                                    <Option value='24h'>Last 24 hours</Option>
+                                    <Option value='3d'>Last 3 days</Option>
+                                    <Option value='7d'>Last 7 days</Option>
+                                </Select>
+                            </RightAlignedButtonWrapper>
+                        }
 
-                <Form.Item
-                    name='warning_cap'
-                    label='Trigger warning when load exceeds'
-                    // tooltip={{ title: 'Trigger warning when bytes used exceed value' }}
-                    rules={[{required : true, message : "Please enter a warning threshold"}]}
-                    initialValue={75}
-                    
-                >
-                    <InputNumber 
-                    placeholder="Load percentage"
-                    min={0}
-                    max={100}
-                    style={{width : "160px"}}
-                    formatter={value => `${value}%`}
-                    parser={value => value.replace('%', '')}
-                    />
-                </Form.Item>
-                
+                        {!weeklyLoading && 
+                            <Line
+                            {...chartConfig}
+                            data={weekly}
+                            />
+                        }
+                    </div>
+                    <div style={contentStyle}>
+                        <h2>Monthly Aggregates</h2>
+                        <RightAlignedButtonWrapper style={{marginBottom : '20px'}}>
+                        <Checkbox checked={customMonthly} onChange={e => setCustomMonthly(e.target.checked)} >Custom range</Checkbox>
+                        </RightAlignedButtonWrapper>
+                        {customMonthly ? 
+                            <RightAlignedButtonWrapper>
+                                <RangePicker onChange={(date_objects, dates) => fetchMonthlyMonitors(device, agent_id, dates[1], dates[0])} />
+                            </RightAlignedButtonWrapper>
+                            :
+                            <RightAlignedButtonWrapper>
+                                Viewing now : 
+                                <Select
+                                    defaultValue="24h"
+                                    onChange={val => fetchMonthlyMonitors(device, agent_id, false, val)}
+                                >
+                                    <Option value='24h'>Last 24 hours</Option>
+                                    <Option value='3d'>Last 3 days</Option>
+                                    <Option value='7d'>Last 7 days</Option>
+                                </Select>
+                            </RightAlignedButtonWrapper>
+                        }
 
-                <Form.Item
-                    name='failure_cap'
-                    label='Trigger failure when load exceeds'
-                    // tooltip={{ title: 'Trigger failure when bytes used exceed value' }}
-                    rules={[{required : true, message : "Please enter a failure threshold"}]}
-                    initialValue={90}
+                        {!monthlyLoading && 
+                            <Line
+                            {...chartConfig}
+                            data={monthly}
+                            />
+                        }
+                    </div>
                     
-                >
-                    <InputNumber 
-                    placeholder="Load percentage"
-                    min={0}
-                    max={100}
-                    style={{width : "160px"}}
-                    formatter={value => `${value}%`}
-                    parser={value => value.replace('%', '')}
-                    />
-                </Form.Item>
+                </Carousel>
                 
             </>
     )
 }
 
-export default CPUMonitorSettings;
+
+export default LoadAggregates;

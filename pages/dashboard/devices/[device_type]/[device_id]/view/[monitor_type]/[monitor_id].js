@@ -33,6 +33,8 @@ var valid_monitors = [
     "inode_monitor",
     "load_monitor",
     "swap_monitor",
+    "sql_monitor",
+
 ]
 
 
@@ -51,10 +53,12 @@ const create_monitor_view = () => {
     const [monitor, setMonitor] = useState(null);
     const [template, setTemplate] = useState(null);
     const [agent, setAgent] = useState(null);
+    const [retention_schedule, setRetention_schedule] = useState(null);
     const [form] = Form.useForm();
 
     if(typeof window !== 'undefined' && monitor_type){
         if(valid_monitors.includes(monitor_type)){
+            console.log(monitor_type)
             var MonitorSettingsPanel = dynamic(() => import(`../../../../../../../components/monitors/settings/${monitor_type}`))
             var MonitorAggregatesPanel = dynamic(() => import(`../../../../../../../components/monitors/aggregates/${monitor_type}`))
         }else{
@@ -89,8 +93,12 @@ const create_monitor_view = () => {
                         console.log("MONITOR HERE",r.response.monitor.response)
                         form.setFieldsValue(r.response.monitor.response);
                         setMetaData(r.response.metadata);
+                        setAgent_id(r.response.metadata.agent_id._id);
                         console.log("METADATA", r.response.metadata)
                         form.setFieldsValue({label : r.response.metadata.label});
+                        const retention_schedule = r.response.metadata.retention_schedule;
+                        setRetention_schedule(retention_schedule);
+                        console.log("RETSCHEDULE",retention_schedule)
                         setTemplate(r.response.notification_template);
                         form.setFieldsValue(r.response.notification_template);
                         setAgent(r.response.metadata.agent_id);
@@ -209,8 +217,9 @@ const create_monitor_view = () => {
                 {/* <Breadcrumb.Item>{device && device.name ? device.name : ""}</Breadcrumb.Item> */}
             </Breadcrumb>
             
-            <Tabs style={{minHeight : '100vh'}} >
-                <TabPane tab={`${monitor ? monitor.label : "Monitor"} aggregates`} >
+            {/* <Tabs style={{minHeight : '100vh'}} activeKey="monitor_aggregates"> */}
+            <Tabs style={{minHeight : '100vh'}} activeKey="monitor_aggregates" >
+                <TabPane tab={`${monitor ? monitor.label : "Monitor"} aggregates`} key="monitor_aggregates">
                     <div style={{height : '100%'}} >
                     {
                         MonitorAggregatesPanel &&
@@ -254,6 +263,8 @@ const create_monitor_view = () => {
                                 device_name={device && device.name}
                                 agentCallback={setAgent_id}
                                 agent={agent}
+                                remote_data={monitor}
+                                metadata={metaData}
                                 >
                                 </DetailsPanel> }
                                 <RightAlignedButtonWrapper>
@@ -278,7 +289,7 @@ const create_monitor_view = () => {
                                 </RightAlignedButtonWrapper>
                             </Panel>
                             <Panel forceRender header="Retention Schedule" key={2}>
-                                <RetentionSchedulePanel/>
+                                <RetentionSchedulePanel retention_schedule={retention_schedule}/>
                                 <RightAlignedButtonWrapper>
                                     {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(1)}>Previous</Button> */}
                                     {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion()}>Next</Button> */}

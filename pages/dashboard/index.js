@@ -115,6 +115,7 @@ const DashboardIndex = () => {
 
   function level_two(state){
     setActiveState(state);
+    console.log(state)
     const dash = dashboard.level_2[`${state == 2 ? "two" : "three"}_states`];
     const two_keys = Object.keys(dash);
     const two_keys_arr = [];
@@ -138,6 +139,7 @@ const DashboardIndex = () => {
         count : monitors_count
       })
     });
+    console.log(two_keys_arr)
     setLevel_2(two_keys_arr);
     setLevel_2_state(state)
     ref_level_2.current.scrollIntoView()
@@ -153,7 +155,7 @@ const DashboardIndex = () => {
         const monitor = dash[monitor_key];
         monitor.ref = monitor_key;
         // if(level_2_state == 2 && monitor.monitor_status == 1) monitor.monitor_status = 2;
-        if(level_2_state == 2){
+        if(activeState == 2){
           switch (monitor.monitor_status) {
             case 0:
               monitor.color = "#3f8600";
@@ -401,7 +403,6 @@ const DashboardIndex = () => {
             <Tag>{monitor.ref}</Tag>
             </div>
           </div>
-          
           </Col>
           </>
         )}
