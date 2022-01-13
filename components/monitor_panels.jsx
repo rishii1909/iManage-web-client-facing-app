@@ -37,7 +37,7 @@ const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallb
                 if(response.accomplished){
                   console.log("FETCHED AGENTS", response.response)
                 setTeamAgents(response.response);
-                agentCallback(response.response[0]._id)
+                if(response.response[0]) agentCallback(response.response[0]._id)
               }else{
                 setTeamAgents([]);
               }

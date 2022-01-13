@@ -13,6 +13,7 @@ import { Header } from "antd/lib/layout/layout";
 import { Skeleton } from "antd";
 import Column from "antd/lib/table/Column";
 import { CheckSquareFilled, CloseSquareFilled, MinusCircleFilled, WarningFilled } from "@ant-design/icons";
+
 const dict_two_states = {
   0 : "Up",
   1 : "Down",
@@ -53,7 +54,7 @@ const DashboardIndex = () => {
 
   useEffect(() => {
     secure_axios(
-      '/monitors/dashboard/showcase',
+      '/monitors/dashboard/showcase/v2',
       {},
       router,
       (response) => {
@@ -115,7 +116,6 @@ const DashboardIndex = () => {
 
   function level_two(state){
     setActiveState(state);
-    console.log(state)
     const dash = dashboard.level_2[`${state == 2 ? "two" : "three"}_states`];
     const two_keys = Object.keys(dash);
     const two_keys_arr = [];
@@ -142,13 +142,15 @@ const DashboardIndex = () => {
     console.log(two_keys_arr)
     setLevel_2(two_keys_arr);
     setLevel_2_state(state)
+    setLevel_3([]);
     ref_level_2.current.scrollIntoView()
     
   }
 
   function level_three(key){
     setLevel_3_state(key);
-    const dash = dashboard.level_3[key];
+    // return console.log(dashboard.level_3)
+    const dash = dashboard.level_3[`${level_2_state == 2 ? "two" : "three"}_states`][key];
     const monitors = [];
     for (const monitor_key in dash) {
       if (Object.hasOwnProperty.call(dash, monitor_key)) {
@@ -222,6 +224,15 @@ const DashboardIndex = () => {
     data: twoStates_lvl_1,
     angleField: 'monitors',
     colorField: 'type',
+    color: ({ type }) => {
+      if(type === 'Up'){
+        return '#3d8468';
+      }
+      if(type === 'Down'){
+        return '#c61c32';
+      }
+      return '#454545';
+    },
     radius: 0.8,
     label: {
       type: 'spider',
@@ -241,6 +252,18 @@ const DashboardIndex = () => {
     data: threeStates_lvl_1,
     angleField: 'monitors',
     colorField: 'type',
+    color: ({ type }) => {
+      if(type === 'OK'){
+        return '#3d8468';
+      }
+      if(type === 'Warning'){
+        return '#FFB20F';
+      }
+      if(type === 'Failure'){
+        return '#c61c32';
+      }
+      return '#454545';
+    },
     radius: 0.8,
     label: {
       type: 'spider',
@@ -261,6 +284,34 @@ const DashboardIndex = () => {
       appendPadding: 0,
       angleField: 'monitors',
       colorField: 'type',
+      color: ({ type }) => {
+
+        switch (level_2_state) {
+          case 2:
+            if(type === 'Up'){
+              return '#3d8468';
+            }
+            if(type === 'Down'){
+              return '#c61c32';
+            }
+            break;
+          
+          case 3:
+            if(type === 'OK'){
+              return '#3d8468';
+            }
+            if(type === 'Warning'){
+              return '#FFB20F';
+            }
+            if(type === 'Failure'){
+              return '#c61c32';
+            }
+        
+          default:
+            break;
+        }
+        return '#454545';
+      },
       radius: 1,
       innerRadius : 0.5,
       label: {
@@ -348,19 +399,19 @@ const DashboardIndex = () => {
           </>
         }
       <Row 
-        justify="space-between"
+        justify="space-evenly"
         align="top"
         style={{paddingTop : '1em'}}
         ref={ref_level_2}
       >
         {level_2.map((host) => 
           <>
-          <Col className={styles['monitor_box']} onClick={() => level_three(host.key)}>
+          <Col span={6} className={styles['monitor_box']} onClick={() => level_three(host.key)}>
             <h3 style={{textAlign : 'center', paddingRight : '12%'}}>{host.key}</h3>
             <Pie 
               {...(level_2_config(host))}
-              width={250}
-              height={220}
+              // width={250}
+              // height={220}
               
               data={host.states}
               style={{margin : '0px'}}
@@ -388,8 +439,8 @@ const DashboardIndex = () => {
       >
         {level_3.map((monitor) => 
           <>
-          <Col style={{border : `2px solid lightGray`}}>
-          <div className={styles['monitor_box']} style={{backgroundColor : monitor.color_faded, borderRadius : '5px', padding : "1.6em 1.6em"}}>
+          <Col style={{border : `2px solid lightGray`, borderRadius : '5px'}}>
+          <div className={styles['monitor_box']} style={{backgroundColor : monitor.color_faded, padding : "1.6em 1.6em"}}>
             <div style={{color : "rgba(black, 0.6)", fontWeight : "600", fontSize : '18px'}}>{monitor.label ? monitor.label : "iManage monitor"}</div>
             
             <Statistic
