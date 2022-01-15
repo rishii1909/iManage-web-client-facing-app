@@ -54,7 +54,7 @@ const DashboardIndex = () => {
 
   useEffect(() => {
     secure_axios(
-      '/monitors/dashboard/showcase/v2',
+      '/monitors/dashboard/showcase/v3',
       {},
       router,
       (response) => {
