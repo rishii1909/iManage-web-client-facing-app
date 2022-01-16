@@ -34,6 +34,7 @@ var valid_monitors = [
     "load_monitor",
     "swap_monitor",
     "sql_monitor",
+    "performance_monitor",
 
 ]
 
