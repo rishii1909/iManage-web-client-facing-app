@@ -1,7 +1,7 @@
 // next.config.js
 const withAntdLess = require('next-plugin-antd-less');
 
-const ec2_url='https://imanage.host:3001'
+const ec2_url='https://imanage.host'
 const heroku_url = "stark-fortress-44852.herokuapp.com";
 const local_url = "https://localhost:3001"
 const http_local_url = "http://localhost:3002"
