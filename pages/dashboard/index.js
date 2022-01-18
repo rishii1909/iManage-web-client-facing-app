@@ -12,7 +12,7 @@ import { secure_axios } from "../../helpers/auth";
 import { Header } from "antd/lib/layout/layout";
 import { Skeleton } from "antd";
 import Column from "antd/lib/table/Column";
-import { CheckSquareFilled, CloseSquareFilled, MinusCircleFilled, WarningFilled } from "@ant-design/icons";
+import { CheckSquareFilled, CloseSquareFilled, MinusCircleFilled, WarningFilled, LoginOutlined } from "@ant-design/icons";
 
 const dict_two_states = {
   0 : "Up",
@@ -46,6 +46,7 @@ const DashboardIndex = () => {
   const [level_2_state, setLevel_2_state] = useState(null);
   const [level_3_state, setLevel_3_state] = useState(null);
   const [activeState, setActiveState] = useState(null);
+  const [calibrate_show, setCalibrate_show] = useState(false);
 
   const ref_level_2 = useRef(null);
   const ref_level_3 = useRef(null);
@@ -53,6 +54,34 @@ const DashboardIndex = () => {
   
 
   useEffect(() => {
+    fetchDashboard();
+  }, []);
+
+  function calibrate(){
+    setLoaded_two_states(false);
+    setLoaded_three_states(false);
+    secure_axios(
+      '/monitors/dashboard/calibrate',
+      {},
+      router,
+      (response) => {
+        try {
+          console.log(response)
+          if(response.accomplished){
+            message.success(response.response.message);
+            fetchDashboard();
+          }else{
+            message.error(response.response);
+          }
+        } catch (error) {
+        }
+      }
+
+    )
+  }
+
+  
+  function fetchDashboard(){
     secure_axios(
       '/monitors/dashboard/showcase/v3',
       {},
@@ -112,7 +141,9 @@ const DashboardIndex = () => {
       }
 
     )
-  }, []);
+  }
+
+
 
   function level_two(state){
     setActiveState(state);
@@ -337,7 +368,6 @@ const DashboardIndex = () => {
     };
   }
 
-
   return ( 
     <Dashboard>
       <div style={{display : "flex", flexFlow : "column"}}>
@@ -458,6 +488,20 @@ const DashboardIndex = () => {
           </>
         )}
       </Row>
+
+      <Divider></Divider>
+
+        <div onMouseEnter={()=>setCalibrate_show(true)} onMouseLeave={()=>setCalibrate_show(false)} style={{display: 'flex', justifyContent : 'flex-end', alignItems : 'center'}}>
+            <div style={{margin : '0 1em', opacity : `${calibrate_show ? 1 : 0.4}`}}>Deleted monitors visible in the dashboard ?</div> 
+            <Button 
+              type="primary" 
+              style={{maxWidth : `${calibrate_show ? "200px" : "0px"}`, opacity : `${calibrate_show ? "1" : "0"}`, transition : '0.3s ease-in', overflow : 'hidden' }} icon={<LoginOutlined />} 
+              onClick={()=>calibrate()} >
+              Calibrate
+            </Button>  
+        </div> 
+      
+      
       </div>
       {/* {threeStates.length > 0 && <Pie {...config_three_states} ></Pie>} */}
     </Dashboard>
