@@ -1,9 +1,9 @@
-import {Button, Form, Input, Radio, Select} from "antd";
+import {Button, Col, Form, Input, Radio, Row, Select} from "antd";
 import{ useState } from 'react';
-    import {PlusSquareOutlined} from "@ant-design/icons"
+    import {PlusSquareOutlined, DeleteOutlined} from "@ant-design/icons"
 const { Option } = Select;
 
-const SQLMonitorSettings = ({hostname}) => {
+const SQLMonitorSettings = ({hostname, form}) => {
     // console.log(hostname)
     // const [hostVal, setHostVal] = useState(hostname);
     // console.log(hostVal)
@@ -14,14 +14,43 @@ const SQLMonitorSettings = ({hostname}) => {
     const [paramCounter, setParamCounter] = useState(0);
     
     const addParameter = () => {
-      setParameters(parameters.push({
-        name : '',
-        value : ''
-    }));
+        setParameters([...parameters, {
+            key : "",
+            val : ""
+        }]);
     }
+
+    const changeKey = (key, i) => {
+        parameters[i].key = key;
+        // console.log(parameters)
+        setParameters(parameters);
+        form.setFieldsValue({parameters : parameters})
+    }
+
+    const changeVal = (val, i) => {
+        // const params = parameters;
+        parameters[i].val = val;
+        setParameters(parameters);
+        form.setFieldsValue({parameters : parameters})
+    }
+
+    // const deleteParam = (i) => {
+    //     console.log(i, parameters)
+    //     // let params = parameters.splice(i, 1);
+    //     // console.log(i, params)
+    //     parameters.splice(i, 1)
+    //     setParameters(parameters)
+    // }
 
     return (
             <>
+
+                <Form.Item
+                    name='username'
+                    label="SQL Username"
+                >
+                    <Input placeholder="Enter SQL username" />
+                </Form.Item>
 
                 <Form.Item
                     name='password'
@@ -56,32 +85,55 @@ const SQLMonitorSettings = ({hostname}) => {
                 }
 
                 {type == 1 && 
+                    <>
                     <Form.Item
                         name='stored_procedure'
                         label="SQL Stored Procedure"
                     >
                         <Input placeholder="Enter stored procedure"/>
                     </Form.Item>
-                }
 
-                {type !== null && 
-                    <>
                     <Form.Item
                         name='parameters'
                         label="Add Parameters"
                         // rules={[{required : true, message : "Please enter OID."}]}
                     >
-                        {parameters && parameters.map((p) => 
+                        {parameters.map((p, i) => 
                             
-                            <Input/>
+                            <Input.Group style={{margin : '0.4em 0'}}>
+                                <Row gutter={8} justify="center" align="center">
+                                    <Col span={12} >
+                                        <Input 
+                                        onChange={key => {
+                                                changeKey(key.target.value, i);
+                                                self.value = key.target.value
+                                            }} 
+                                        />
+                                    </Col>
+                                    <Col span={12} >
+                                        <Input onChange={val => {
+                                            changeVal(val.target.value, i);
+                                            self.value = val.target.value
+                                        }} />
+                                    </Col>
+                                    {/* <Col span={4} > 
+                                        <Button size="medium" onClick={() => deleteParam(i)} className="delete-button" color="red" type="primary" icon={<DeleteOutlined/>}></Button> 
+                                    </Col> */}
+                                </Row>
+                            </Input.Group>
 
                         )}
-                        <Button icon={<PlusSquareOutlined/>} onClick={() => addParameter()}>Add Parameter</Button>
+                        <Button type="primary" icon={<PlusSquareOutlined/>} onClick={() => addParameter()}>Add Parameter</Button>
                     </Form.Item>
+                    </>
+                }
 
+                {type !== null && 
+                    <>
                     <Form.Item
                         name='comparator'
                         label="Comparision operator"
+                        initialValue={"="}
                         // rules={[{required : true, message : "Please enter OID."}]}
                     >
                         <Select >

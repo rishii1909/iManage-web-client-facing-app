@@ -1,7 +1,7 @@
 import {Form, Slider} from "antd";
 import{ useState, useEffect } from 'react';
 
-const RetentionSchedulePanel = ({retention_schedule}) => {
+const RetentionSchedulePanel = ({form, retention_schedule}) => {
     
     const [rawData, setRawData] = useState( 0 );
     const [dailyAggr, setDailyAggr] = useState( 0 );
@@ -36,7 +36,10 @@ const RetentionSchedulePanel = ({retention_schedule}) => {
                         step={10}
                         value={rawData}
                         tipFormatter={(val) => {return `${val} months`}}
-                        onChange={(val) => { return setRawData(val)}}
+                        onChange={(val) => { 
+                            setRawData(val);
+                            form.setFieldsValue({raw_data : val})
+                        }}
                     ></Slider>
                     </div>
                 </Form.Item>
@@ -57,7 +60,10 @@ const RetentionSchedulePanel = ({retention_schedule}) => {
                         step={10}
                         value={dailyAggr}
                         tipFormatter={(val) => {return `${val} months`}}
-                        onChange={(val) => setDailyAggr(val)}
+                        onChange={(val) => {
+                            setDailyAggr(val);
+                            form.setFieldsValue({daily_aggr : val})
+                        }}
                     ></Slider>
                     </div>
                 </Form.Item>
@@ -78,7 +84,10 @@ const RetentionSchedulePanel = ({retention_schedule}) => {
                         step={10}
                         value={weeklyAggr}
                         tipFormatter={(val) => {return `${val} months`}}
-                        onChange={(val) => setWeeklyAggr(val)}
+                        onChange={(val) => {
+                            setWeeklyAggr(val);
+                            form.setFieldsValue({ weekly_aggr : val})
+                        }}
                     ></Slider>
                     </div>
                 </Form.Item>
@@ -99,7 +108,10 @@ const RetentionSchedulePanel = ({retention_schedule}) => {
                         step={10}
                         value={monthlyAggr}
                         tipFormatter={(val) => {return `${val} months`}}
-                        onChange={(val) => setMonthlyAggr(val)}
+                        onChange={(val) => {
+                            setMonthlyAggr(val);
+                            form.setFieldsValue({ monthly_aggr : val})
+                        }}
                     ></Slider>
                     </div>
                 </Form.Item>

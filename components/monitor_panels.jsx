@@ -71,7 +71,7 @@ const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallb
                         </Select>
                     </Form.Item>
                 }
-                {agent && 
+                {/* {agent && 
                     <Form.Item
                     name='null_agent'
                     labelCol={{span: 5}}
@@ -89,7 +89,7 @@ const DetailsPanel = ({ host, device_type, device_name, monitor_type, agentCallb
                             }
                         </Select>
                     </Form.Item>
-                }
+                } */}
                 <Form.Item
                     name='label'
                     labelCol={{span: 5}}

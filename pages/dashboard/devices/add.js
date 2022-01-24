@@ -14,6 +14,7 @@ const device_add = () => {
     const router = useRouter();
     const [deviceType, setDeviceType] = useState(null);
     const [snmp, setSnmp] = useState(false);
+    const [server_type, setServer_type] = useState(null);
     useEffect(() => {
         const type = device_types.includes(router.query.type) ? router.query.type : false;
         if(!type) router.replace('/dashboard/devices');
@@ -110,6 +111,7 @@ const device_add = () => {
             >
                 <Select 
                     placeholder="Select remote device type"
+                    onChange={(type) => setServer_type(type)}
                 >
                     <Option 
                         value="0"
@@ -182,15 +184,6 @@ const device_add = () => {
             </Form.Item>
 
             <Form.Item
-                name='username'
-                label='Username'
-                required={true}
-                tooltip='Login username of your remote device, for SSH access.'
-                rules={[{required : true, message : "Please enter your device's SSH username."}]}
-            >
-                <Input placeholder="Enter username"></Input>
-            </Form.Item>
-            <Form.Item
                 name='host'
                 label='Hostname'
                 required={true}
@@ -199,6 +192,18 @@ const device_add = () => {
             >
                 <Input placeholder="Enter hostname"></Input>
             </Form.Item>
+            {server_type != "1" &&
+                <>
+                <Form.Item
+                name='username'
+                label='Username'
+                required={true}
+                tooltip='Login username of your remote device, for SSH access.'
+                rules={[{required : true, message : "Please enter your device's SSH username."}]}
+            >
+                <Input placeholder="Enter username"></Input>
+            </Form.Item>
+            
 
             <Form.Item 
                 name='auth_method'
@@ -250,6 +255,8 @@ const device_add = () => {
                 </Form.Item>
                 }
                 </div>
+            }
+                </>
             }
 
             <Form.Item {...tailLayout}>
