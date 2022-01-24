@@ -46,10 +46,10 @@ const SQLMonitorSettings = ({hostname, form}) => {
             <>
 
                 <Form.Item
-                    name='host'
-                    label="SQL Host"
+                    name='datasource'
+                    label="SQL Data Source"
                 >
-                    <Input placeholder="Enter SQL host" />
+                    <Input placeholder="Enter SQL Data Source" />
                 </Form.Item>
 
                 <Form.Item
