@@ -46,6 +46,13 @@ const SQLMonitorSettings = ({hostname, form}) => {
             <>
 
                 <Form.Item
+                    name='host'
+                    label="SQL Host"
+                >
+                    <Input placeholder="Enter SQL host" />
+                </Form.Item>
+
+                <Form.Item
                     name='username'
                     label="SQL Username"
                 >

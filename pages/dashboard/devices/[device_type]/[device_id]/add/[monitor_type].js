@@ -77,7 +77,6 @@ const create_monitor_view = () => {
 
 
     const on_finish = async (data) => {
-        console.log(data.offline_time_1,data.offline_time_2)
         data.offline_times = {};
         if(Array.isArray(data.offline_time_1)){
             data.offline_times.offline_time_1_start = `${data.offline_time_1[0]['_d'].getMinutes()} ${data.offline_time_1[0]['_d'].getHours()} * * *`
@@ -96,7 +95,7 @@ const create_monitor_view = () => {
             retsch_export : data.retsch_export,
         }
 
-        // return console.log(data)
+        // return console.log(data, data.proc_name)
         let notification_rules = {};
         if(data.custom == "every"){
             notification_rules = {
@@ -125,11 +124,13 @@ const create_monitor_view = () => {
                 }
             }
         }
-        console.log(data);
         const merged = {...data, ...(device.creds), notification_rules};
         if(data.host) merged.host = data.host;
+        if(data.password) merged.password = data.password;
+        if(data.username) merged.username = data.username;
         merged.type = monitor_type;
         merged.device_id = device_id
+        // return console.log(merged);
         const loading = message.loading("Creating monitor...", 0);
         if(data.template_name){
             await secure_axios('/notifs/create', {
@@ -263,7 +264,7 @@ const create_monitor_view = () => {
                                 </RightAlignedButtonWrapper>
                             </Panel>
                             <Panel forceRender header="Retention Schedule" key={2}>
-                                <RetentionSchedulePanel/>
+                                <RetentionSchedulePanel form={form} />
                                 <RightAlignedButtonWrapper>
                                     {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(1)}>Previous</Button> */}
                                     {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion()}>Next</Button> */}
