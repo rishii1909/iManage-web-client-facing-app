@@ -219,7 +219,7 @@ const create_monitor_view = () => {
             </Breadcrumb>
             
             {/* <Tabs style={{minHeight : '100vh'}} activeKey="monitor_aggregates"> */}
-            <Tabs style={{minHeight : '100vh'}} activeKey="monitor_aggregates" >
+            <Tabs style={{minHeight : '100vh'}}  defaultActiveKey="monitor_details" >
                 <TabPane tab={`${monitor ? monitor.label : "Monitor"} aggregates`} key="monitor_aggregates">
                     <div style={{height : '100%'}} >
                     {
