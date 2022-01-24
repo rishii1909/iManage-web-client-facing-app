@@ -111,6 +111,7 @@ const SQLMonitorSettings = ({hostname, form}) => {
                                 <Row gutter={8} justify="center" align="center">
                                     <Col span={12} >
                                         <Input 
+                                        placeholder="Name"
                                         onChange={key => {
                                                 changeKey(key.target.value, i);
                                                 self.value = key.target.value
@@ -118,7 +119,9 @@ const SQLMonitorSettings = ({hostname, form}) => {
                                         />
                                     </Col>
                                     <Col span={12} >
-                                        <Input onChange={val => {
+                                        <Input 
+                                        placeholder="Value"
+                                        onChange={val => {
                                             changeVal(val.target.value, i);
                                             self.value = val.target.value
                                         }} />
