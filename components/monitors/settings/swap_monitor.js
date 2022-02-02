@@ -74,8 +74,8 @@ const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id, form}) 
                             (val) => {
                                 setSwap(val); 
                                 form.setFieldsValue({
-                                    warning_used_exceeds_cap : Math.floor(swap[val].size * 0.75),
-                                    failure_used_exceeds_cap : Math.floor(swap[val].size * 0.9),
+                                    warning_cap : Math.floor(swap[val].size * 0.75),
+                                    failure_cap : Math.floor(swap[val].size * 0.9),
                                 })
                             }
                         }
@@ -88,7 +88,7 @@ const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id, form}) 
                 <Button onClick={()=>fetchSwaps(device, agent_id)} disabled={!(swaps == null)}>Retry</Button>
 
                 <Form.Item
-                    name='warning_used_exceeds_cap'
+                    name='warning_cap'
                     label='Warning usage exceed threshold'
                     tooltip={{ title: 'Trigger warning when space used exceed value' }}
                     rules={[{required : true, message : "Please enter a warning threshold"}]}
@@ -101,7 +101,7 @@ const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id, form}) 
                 
 
                 <Form.Item
-                    name='failure_used_exceeds_cap'
+                    name='failure_cap'
                     label='Failure usage exceed threshold'
                     tooltip={{ title: 'Trigger failure when space used exceed value' }}
                     rules={[{required : true, message : "Please enter a failure threshold"}]}

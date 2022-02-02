@@ -1,13 +1,21 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import Router from 'next/router'
+import React, { useState } from 'react';
 import { Form, Input, Button, Checkbox, Row, Col, Space } from 'antd';
 import styles from "./login.module.css";
-import { InfoCircleOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { Header } from 'antd/lib/layout/layout';
 import axios from 'axios';
 import { getAccessToken, setToken } from '../../helpers/auth';
+
+
 export default function login_form() {
+
+  const [forgotPassword, setForgotPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+
   const onFinish = (values) => {
     axios.post(
       `${process.env.API_URL}/login`,
@@ -35,7 +43,9 @@ export default function login_form() {
         }}
         onFinish={onFinish}
       >
-      <h1 style={{textAlign : 'center'}}>Welcome back!</h1>
+      {!forgotPassword ?
+        <>
+        <h1 style={{textAlign : 'center'}}>Welcome back!</h1>
         <Form.Item
           name="email"
           rules={[
@@ -45,7 +55,13 @@ export default function login_form() {
             },
           ]}
         >
-          <Input prefix={<UserOutlined className="site-form-item-icon" />} value='martynbenjamin@gmail.com' placeholder="Email" />
+          <Input 
+          prefix={<UserOutlined 
+          className="site-form-item-icon" />} 
+          value={email}
+          onChange={val => setEmail(val)}
+          placeholder="Email" 
+          />
         </Form.Item>
         <Form.Item
           name="password"
@@ -64,7 +80,7 @@ export default function login_form() {
           />
         </Form.Item>
         <Form.Item>  
-          <a className="login-form-forgot" href="">
+          <a className="login-form-forgot" style={{textDecoration : "underline"}} onClick={() => setForgotPassword(true)}>
             Forgot password
           </a>
         </Form.Item>
@@ -76,6 +92,25 @@ export default function login_form() {
           </Button>
           </Space>
         </Form.Item>
+        </>
+      :
+      <>
+      <h2 style={{textAlign : 'center'}}>Forgot Password</h2>
+      <p>Please enter your email address, an OTP will be sent to help reset your password.</p>
+      <Form.Item
+          name="otp"
+         
+        >
+          <Input 
+          prefix={<MailOutlined 
+          className="site-form-item-icon" />} 
+          value={otp}
+          onChange={val => setOtp(val)}
+          placeholder="OTP" 
+          />
+        </Form.Item>
+      </>
+      }
       </Form>
       </Col>
     </div>
