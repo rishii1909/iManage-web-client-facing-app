@@ -27,6 +27,13 @@ a {
   top: 20px;
 }
 
+.delete-button{
+  opacity: 0.5;
+  transition: 0.3s ease-in-out;
+}
+.delete-button:hover{
+  opacity: 1;
+}
 .ui-list-item:hover, .ui-list-item:active {
   background-color: rgba(211, 211, 211, 0.301);
   cursor: pointer;

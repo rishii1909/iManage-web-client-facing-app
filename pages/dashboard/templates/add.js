@@ -47,6 +47,11 @@ const vars = [
         name : "<%EventMessage%>",
         description : "Event verbose message",
     },
+    {
+        key : "<%Top10%>",
+        name : "<%Top10%>",
+        description : "Display a list of top 10 running processes. Only available on Disk and CPU monitors."
+    }
 
     
 
