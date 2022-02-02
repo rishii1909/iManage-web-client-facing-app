@@ -11,9 +11,10 @@ const FileMonitorSettings = ({hostname, device_id, device_type, form}) => {
     const [services, setServices] = useState(null);
     const [service_id, setService_id] = useState(null);
     const [agent, setAgent] = useState(null);
-    const [dir_path, setDir_path] = useState("/");
+    const [dir_path, setDir_path] = useState(null);
     const [file_pattern, setFile_pattern] = useState("");
     const router = useRouter();
+
     useEffect(async () => {
         if(device_id){
             secure_axios(
@@ -39,34 +40,45 @@ const FileMonitorSettings = ({hostname, device_id, device_type, form}) => {
                 }
                 )
         }
-    }, [device_id]);
-
-    function fetchServices(agent_id){
-        console.log(agent_id)
-        if(device){
-            secure_axios(
-                '/monitors/remote',
-                {
-                    ...{
-                        api_path : '/api/service_monitor/fetch/enumerate',
-                        api_method : 'post',
-                        agent_id : agent_id,
-                    },
-                    ...device.creds
-                },
-                router,
-                (response) => {
-                    console.log(response)
-
-                    if(response.accomplished){
-                        setServices(response.response.enumerate);
-                    }else{
-                        message.error(response.response.message ? response.response.message : response.response)
-                    }
-                }
-            )
+        if(form){
+            const file_path = form.getFieldValue("file_path");
+            if(file_path){
+                const dir_path = file_path.substring(0, file_path.lastIndexOf("/") + 1);
+                var file_pattern = file_path.substring(file_path.lastIndexOf("/") + 1, file_path.length);
+                setDir_path(dir_path)
+                form.setFieldsValue({dir_path : dir_path})
+                setFile_pattern(file_pattern)
+                form.setFieldsValue({file_pattern : file_pattern})
+            }
         }
-    }
+    }, [device_id, form]);
+
+    // function fetchServices(agent_id){
+    //     console.log(agent_id)
+    //     if(device){
+    //         secure_axios(
+    //             '/monitors/remote',
+    //             {
+    //                 ...{
+    //                     api_path : '/api/service_monitor/fetch/enumerate',
+    //                     api_method : 'post',
+    //                     agent_id : agent_id,
+    //                 },
+    //                 ...device.creds
+    //             },
+    //             router,
+    //             (response) => {
+    //                 console.log(response)
+
+    //                 if(response.accomplished){
+    //                     setServices(response.response.enumerate);
+    //                 }else{
+    //                     message.error(response.response.message ? response.response.message : response.response)
+    //                 }
+    //             }
+    //         )
+    //     }
+    // }
 
     return (
             <>

@@ -19,18 +19,25 @@ exports.logout = () => {
 }
 
 exports.handle_error = (response) => {
-  if(response.response){
+  try {
+    if(response.response){
       const resp = response.response
       if(resp.message){
           message.error(resp.message);
       }
-      else if(resp.error){
+      else if(resp.error && typeof resp.error == "string"){
           message.error(resp.error)
       }else{
           message.error(resp)
       }
   }else{
-      if(response.error) message.error(response.error);
+      if(response.error && typeof response.error == "string" ) message.error(response.error);
+      else message.error("Resource not accessible.")
+  }
+
+  } catch (err) {
+    console.log(response, err);
+    message.error("Resource not accessible.")
   }
 }
 

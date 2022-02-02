@@ -1,13 +1,23 @@
 import {Form, Input, InputNumber, Radio, Slider} from "antd";
-import{ useState } from 'react';
+import{ useState, useEffect } from 'react';
 
 const {TextArea} = Input;
 const UrlMonitorSettings = ({form}) => {
     
     const [warn_content, setWarn_content] = useState("");
     const [fail_content, setFail_content] = useState("");
+    const [warn_if_not_found, setWarn_if_not_found] = useState(true);
+    const [fail_if_not_found, setFail_if_not_found] = useState(true);
+    useEffect(() => {
+        if(form){
+            setWarn_content(form.getFieldValue("warning_content"));
+            setFail_content(form.getFieldValue("failure_content"));
+            setWarn_if_not_found(form.getFieldValue("warn_if_not_found"));
+            setFail_if_not_found(form.getFieldValue("fail_if_not_found"));
+        }
+    }, [form]);
 
-
+    // console.log("FORM IN URL MONITOR SETTINGS : ",form)
     return (
             <>
                 <Form.Item
@@ -41,14 +51,14 @@ const UrlMonitorSettings = ({form}) => {
 
                 {warn_content && 
                     <Form.Item
-                        name='warn_if_found'
+                        name='warn_if_not_found'
                         label="Warning Trigger condition"
                     >
                         <Radio.Group defaultValue={true} buttonStyle="solid"  >
-                            <Radio.Button value={true} >
+                            <Radio.Button value={false} >
                                 Warn if found
                             </Radio.Button>
-                            <Radio.Button value={false} >
+                            <Radio.Button value={true} >
                                 Warn if not found
                             </Radio.Button>
                         </Radio.Group>
@@ -63,14 +73,14 @@ const UrlMonitorSettings = ({form}) => {
                 </Form.Item>
                 {fail_content && 
                     <Form.Item
-                        name='fail_if_found'
+                        name='fail_if_not_found'
                         label="Failure Trigger condition"
                     >
                         <Radio.Group defaultValue={true} buttonStyle="solid"  >
-                            <Radio.Button value={true} >
+                            <Radio.Button value={false} >
                                 Fail if found
                             </Radio.Button>
-                            <Radio.Button value={false} >
+                            <Radio.Button value={true} >
                                 Fail if not found
                             </Radio.Button>
                         </Radio.Group>
