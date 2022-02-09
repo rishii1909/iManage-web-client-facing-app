@@ -11,6 +11,7 @@ const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id, form}) 
     const [disks, setDisks] = useState(null);
     const [disk_id, setDisk_id] = useState(null);
     const [agent, setAgent] = useState(null);
+    const [inputType, setInputType] = useState(0);
     const router = useRouter();
 
     useEffect(async () => {
@@ -89,21 +90,48 @@ const CPUMonitorSettings = ({hostname, device_id, device_type, agent_id, form}) 
                 </Form.Item> */}
 
                 <Form.Item
-                    name='disk_id'
-                    labelCol={{span: 5}}
-                    label='Select Disk'
-                    rules={[{required : true, message : "Please select a disk."}]}
-                    
+                    label="Select Disk Type"
                 >
                     <Select 
-                        placeholder={`Choose a disk.`}
-                        onChange={(val) => {setDisk_id(val)}}
+                        onChange={(val) => {setInputType(val)}}
+                        value={inputType}
+                        defaultActiveFirstOption
                     >
-                        {disks && Object.keys(disks).map((key)=>{
-                            return <Option value={disks[key].disk_id} key={disks[key].disk_id}><div style={{display : "flex", justifyContent : "space-between"}}>{key} <Tag>Used : {disks[key].used_perc} | Total space : {disks[key].total_space}</Tag> </div></Option>
-                        })}
+                        <Option value={0} key="disks">Select a Disk</Option>
+                        <Option value={1} key="shares">Select a Network Share</Option>
+
                     </Select>
                 </Form.Item>
+
+                {inputType == 0 ? 
+                    <Form.Item
+                        name='disk_id'
+                        labelCol={{span: 5}}
+                        label='Select Disk'
+                        rules={[{required : true, message : "Please select a disk."}]}
+
+                    >
+                        <Select 
+                            placeholder={`Choose a disk.`}
+                            onChange={(val) => {setDisk_id(val)}}
+                        >
+                            {disks && Object.keys(disks).map((key)=>{
+                                return <Option value={disks[key].disk_id} key={disks[key].disk_id}><div style={{display : "flex", justifyContent : "space-between"}}>{key} <Tag>Used : {disks[key].used_perc} | Total space : {disks[key].total_space}</Tag> </div></Option>
+                            })}
+                        </Select>
+                    </Form.Item>
+                :
+                    <Form.Item
+                        name='disk_share'
+                        labelCol={{span: 5}}
+                        label='Enter network share share'
+                        rules={[{required : true, message : "Please enter path."}]}
+                            
+                    >
+                        <Input/>
+                    </Form.Item>
+                }
+                
                 <Button onClick={()=>fetchDisks(device, agent_id)} disabled={!(disks == null)}>Retry</Button>
                 <Form.Item
                     name='warning_cap'
