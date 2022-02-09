@@ -27,6 +27,7 @@ var valid_monitors = [
     "disk_monitor",
     "file_monitor",
     "service_monitor",
+    "performance_monitor",
     "snmp_monitor",
     "cron_monitor",
     "inode_monitor",

@@ -20,6 +20,7 @@
     "fs": "^0.0.1-security",
     "less": "^4.1.2",
     "less-loader": "^10.1.0",
+    "moment": "^2.29.1",
     "next": "11.1.2",
     "next-plugin-antd-less": "^1.4.3",
     "null-loader": "^4.0.1",

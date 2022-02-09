@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Row, Col, Layout, Menu, Drawer, List, Empty, Space, Button, Tag, message, Divider } from 'antd';
-import { BellOutlined, DeleteFilled, DeleteOutlined, LogoutOutlined, ReloadOutlined, SwapRightOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons';
+import { BellOutlined, SettingOutlined, DeleteOutlined, LogoutOutlined, ReloadOutlined, SwapRightOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons';
 import Link from 'next/link'
 import Router, { useRouter } from 'next/router';
 import { handle_error, logout, secure_axios } from '../../../helpers/auth';
@@ -116,9 +116,9 @@ export default function dashboard({ domain, subdomain, children }){
               <Menu.Item onClick={() => setNotificationDrawer(true)} >
               <BellOutlined/> {notifs.length > 0 && <span className="notification-dot"></span>}
               </Menu.Item>
-              <SubMenu icon={<UserOutlined/>} title="Profile">
-                <Menu.Item icon={<TeamOutlined/>}>
-                  <Link href={`${base_route}/team`}>My Team</Link>
+              <SubMenu icon={<SettingOutlined/>} title="Settings">
+                <Menu.Item icon={<UserOutlined/>}>
+                  <Link href={`${base_route}/profile`}>Profile</Link>
                 </Menu.Item>
                 <Menu.Item onClick={UserLogout} icon={<LogoutOutlined/>}>
                 Log out

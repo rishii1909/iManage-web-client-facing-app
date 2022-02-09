@@ -15,7 +15,8 @@ exports.monitor_types = {
   "service_monitor" : "Service monitor", // 
   "cron_monitor" : "Cron monitor", // 
   "snmp_monitor" : "SNMP monitor", // 
-  "sql_monitor" : "SQL monitor"
+  "sql_monitor" : "SQL monitor",
+  "performance_monitor" : "Performance monitor", // 
 }
 
 exports.binary_monitors = {
@@ -31,4 +32,5 @@ exports.binary_monitors = {
   "cron_monitor" : true,
   "load_monitor" : false,
   "swap_monitor" : false,
+  "performance_monitor" : false,
 }

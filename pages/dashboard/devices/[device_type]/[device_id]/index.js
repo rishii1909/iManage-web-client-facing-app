@@ -18,6 +18,7 @@ const device_view = () => {
     const router = useRouter();
     const { device_type, device_id } = router.query;
     const [device, setDevice] = useState(device_id);
+    const [server_type, setServer_type] = useState(false);
     const [monitors, setMonitors] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [performanceModalVisible, setPerformanceModalVisible] = useState(false);
@@ -31,7 +32,10 @@ const device_view = () => {
                     const data = response.response
                     console.log(data);
                     setMonitors(data.monitors);
+                    console.log("DEVICE", data);
                     setDevice(data);
+                    setServer_type(data.type);
+                    setServer_type(1);
                     let auth_data = null;
                     if(data.creds.password) auth_data = 0;
                     if(data.creds.privateKey) auth_data = 1;
@@ -230,6 +234,8 @@ const device_view = () => {
                         </Link>
                         )}
                     >
+                        {(server_type == 0) && 
+                        <>
                         <List.Item onClick={() => setPerformanceModalVisible(true)} className={styles['device-list-item']} >
                             <Row style={{width : "100%"}} >
                               <Col span={16}>
@@ -240,6 +246,27 @@ const device_view = () => {
                             </Row>
                             <Tag color="red">PRO</Tag>
                         </List.Item>
+                        </>
+
+                        }
+
+                        {(server_type == 1) && 
+                        <>
+                        <Link href={`/dashboard/devices/${device_type}/${device_id}/add/performance_monitor`} key="performance_monitor">
+                          <List.Item className={styles['device-list-item']} >
+                            <Row style={{width : "100%"}} >
+                              <Col span={16}>
+                                <List.Item.Meta
+                                  title="Performance monitor"
+                                />
+                              </Col>
+                            </Row>
+                                <Tag color="red">PRO</Tag>
+                          </List.Item>
+                        </Link>
+                        </>
+
+                        }
                         <Modal
                             title="Add a Performance monitor"
                             visible={performanceModalVisible}
