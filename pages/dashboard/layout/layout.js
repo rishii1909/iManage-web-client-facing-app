@@ -100,16 +100,9 @@ export default function dashboard({ domain, subdomain, children }){
           <Header className="header" style={{padding : '0px'}}>
             <div className="logo" />
             
-            <Row justify="space-between" wrap={false}>
+            <Row justify="end" wrap={false}>
 
-            <Col>
-              <Menu theme="dark" mode='horizontal' defaultSelectedKeys={[domain || false]}>
-
-                  <Menu.Item key="monitors"> <Link href={`${base_route}/monitors`}>Monitors</Link> </Menu.Item>
-                  <Menu.Item key="devices"> <Link href={`${base_route}/devices`}>Devices</Link> </Menu.Item>
-                  <Menu.Item key="agents"> <Link href={`${base_route}/agents`}>Agents</Link> </Menu.Item>
-            </Menu>
-            </Col>
+            
             <Col span={3}>
               
               <Menu theme='dark' mode='horizontal' selectable={false}>
