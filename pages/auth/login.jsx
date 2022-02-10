@@ -1,6 +1,8 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import Router from 'next/router'
+import Link from "next/link";
+
 import React, { useState } from 'react';
 import { Form, Input, Button, Checkbox, Row, Col, Space, message } from 'antd';
 import styles from "./login.module.css";
@@ -150,6 +152,13 @@ export default function login_form() {
           <a className="login-form-forgot" style={{textDecoration : "underline"}} onClick={() => setForgotPassword(true)}>
             Forgot password
           </a>
+          <br></br>
+          <br></br>
+          <div 
+            style={{textAlign : 'right', margin : 'auto 0px'}}
+          >
+          Don't have an account? <Link className='login-form-forgot' href="/auth/register" style={{textDecoration : "underline"}}>Sign Up</Link>
+          </div>
         </Form.Item>
   
         <Form.Item>
