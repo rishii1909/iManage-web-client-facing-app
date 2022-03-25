@@ -33,7 +33,7 @@ const RetentionSchedulePanel = ({form, retention_schedule}) => {
                     <Slider
                         min={0}
                         max={100}
-                        step={10}
+                        step={1}
                         value={rawData}
                         tipFormatter={(val) => {return `${val} months`}}
                         onChange={(val) => { 
@@ -57,7 +57,7 @@ const RetentionSchedulePanel = ({form, retention_schedule}) => {
                         <Slider
                         min={0}
                         max={100}
-                        step={10}
+                        step={1}
                         value={dailyAggr}
                         tipFormatter={(val) => {return `${val} months`}}
                         onChange={(val) => {
@@ -81,7 +81,7 @@ const RetentionSchedulePanel = ({form, retention_schedule}) => {
                         <Slider
                         min={0}
                         max={100}
-                        step={10}
+                        step={1}
                         value={weeklyAggr}
                         tipFormatter={(val) => {return `${val} months`}}
                         onChange={(val) => {
@@ -105,7 +105,7 @@ const RetentionSchedulePanel = ({form, retention_schedule}) => {
                         <Slider
                         min={0}
                         max={100}
-                        step={10}
+                        step={1}
                         value={monthlyAggr}
                         tipFormatter={(val) => {return `${val} months`}}
                         onChange={(val) => {
