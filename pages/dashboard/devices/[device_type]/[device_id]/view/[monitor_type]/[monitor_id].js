@@ -92,7 +92,7 @@ const create_monitor_view = () => {
     }
   }
   useEffect(async () => {
-    if (device_id) {
+    if (form && device_id && monitor_id) {
       secure_axios(
         "/devices/enumerate/device",
         { device_id: device_id, show_creds: true },
@@ -106,8 +106,7 @@ const create_monitor_view = () => {
           }
         }
       );
-    }
-    if (monitor_id) {
+
       secure_axios(
         "/monitors/enumerate/monitor",
         { monitor_id },
@@ -134,7 +133,7 @@ const create_monitor_view = () => {
         }
       );
     }
-  }, [monitor_id]);
+  }, [form, device_id, monitor_id]);
 
   const on_finish = async (data) => {
     let notification_rules = {};
@@ -159,7 +158,7 @@ const create_monitor_view = () => {
       };
     } else {
       notification_rules = {
-        alert_all: true,
+        alert_all: false,
         alert_rules: {
           every: 1,
         },
@@ -337,8 +336,9 @@ const create_monitor_view = () => {
                   {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion([0,1,2])}>Next</Button> */}
                 </RightAlignedButtonWrapper>
               </Panel>
-              <Panel forceRender header="Retention Schedule" key={2}>
+              <Panel forceRender header="Log Settings" key={2}>
                 <RetentionSchedulePanel
+                  form={form}
                   retention_schedule={retention_schedule}
                 />
                 <RightAlignedButtonWrapper>
@@ -354,7 +354,7 @@ const create_monitor_view = () => {
                                 </RightAlignedButtonWrapper>
                             </Panel> */}
               <Panel forceRender header="Notification Rules" key={4}>
-                <NotificationRulesPanel form={form} />
+                <NotificationRulesPanel form={form} monitor={monitor} />
                 <RightAlignedButtonWrapper>
                   {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(3)}>Previous</Button> */}
                   {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(5)}>Next</Button> */}
