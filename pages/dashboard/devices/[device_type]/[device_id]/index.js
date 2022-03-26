@@ -185,8 +185,38 @@ const device_view = () => {
     setAuth(choice);
   }
 
-  function delete_monitor(monitor_id, monitor_name) {
+  async function checkAgentConnection(agentId) {
+    let isAgentActive = false;
+    await secure_axios(
+      `/agents/enumerate/${device_type}`,
+      {},
+      router,
+      (response) => {
+        if (response.accomplished) {
+          const agents = response.response;
+          const monitor_agent = agents.find((agent) => {
+            console.log(agent._id, agentId);
+            return agent._id === agentId;
+          });
+          isAgentActive = monitor_agent.connected;
+        } else {
+          isAgentActive = false;
+        }
+      }
+    );
+
+    return isAgentActive;
+  }
+
+  async function delete_monitor(monitor_id, monitor_name, agent_id) {
     const loading = message.loading(`Deleting ${monitor_name}...`, 0);
+
+    if (!(await checkAgentConnection(agent_id))) {
+      message.error("Agent is not connected!");
+      loading();
+      return;
+    }
+
     secure_axios(
       `/monitors/delete/${device_type}`,
       { monitor_id },
@@ -295,7 +325,11 @@ const device_view = () => {
                     icon={<DeleteFilled />}
                     onClick={(e) => {
                       e.stopPropagation();
-                      delete_monitor(monitor._id, monitor.label);
+                      delete_monitor(
+                        monitor._id,
+                        monitor.label,
+                        monitor.agent_id
+                      );
                     }}
                   >
                     Delete
