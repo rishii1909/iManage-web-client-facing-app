@@ -48,6 +48,8 @@ const device_view = () => {
   const [performanceModalVisible, setPerformanceModalVisible] = useState(false);
   const [form] = Form.useForm();
 
+  const [deviceRemote, setDeviceRemote] = useState("");
+
   useEffect(async () => {
     if (device_id) {
       const loading = message.loading("Fetching device information...");
@@ -70,6 +72,7 @@ const device_view = () => {
             handleAuth(auth_data);
             data.snmp = snmp[data.snmp];
             data.type = types[data.type];
+            setDeviceRemote(data.type);
             form.setFieldsValue({
               ...response.response,
               ...response.response.creds,
@@ -435,7 +438,12 @@ const device_view = () => {
                 },
               ]}
             >
-              <Select placeholder="Select remote device type">
+              <Select
+                placeholder="Select remote device type"
+                onChange={(val) => {
+                  setDeviceRemote(val);
+                }}
+              >
                 <Option value="0">Linux Server</Option>
                 <Option value="1">Windows Server</Option>
                 <Option value="2">Cisco Router</Option>
@@ -486,15 +494,15 @@ const device_view = () => {
                 Private
               </Checkbox>
             </Form.Item>
-
+            {console.log(deviceRemote)}
             <Form.Item
               name="username"
               label="Username"
-              required={true}
               tooltip="Login username of your remote device, for SSH access."
               rules={[
                 {
-                  required: true,
+                  required:
+                    parseInt(formValToTypes[deviceRemote]) === 1 ? false : true,
                   message: "Please enter your device's SSH username.",
                 },
               ]}
@@ -521,7 +529,8 @@ const device_view = () => {
               label="Authentication method"
               rules={[
                 {
-                  required: true,
+                  required:
+                    parseInt(formValToTypes[deviceRemote]) === 1 ? false : true,
                   message: "Please provide an authentication method.",
                 },
               ]}
@@ -537,7 +546,13 @@ const device_view = () => {
                 name="password"
                 label="Password"
                 rules={[
-                  { required: true, message: "Please enter the password." },
+                  {
+                    required:
+                      parseInt(formValToTypes[deviceRemote]) === 1
+                        ? false
+                        : true,
+                    message: "Please enter the password.",
+                  },
                 ]}
               >
                 <Input.Password placeholder="Enter password"></Input.Password>
@@ -551,7 +566,10 @@ const device_view = () => {
                   label="Private key"
                   rules={[
                     {
-                      required: true,
+                      required:
+                        parseInt(formValToTypes[deviceRemote]) === 1
+                          ? false
+                          : true,
                       message: "Please enter the private key.",
                     },
                   ]}
@@ -579,7 +597,10 @@ const device_view = () => {
                     label="Passphrase"
                     rules={[
                       {
-                        required: true,
+                        required:
+                          parseInt(formValToTypes[deviceRemote]) === 1
+                            ? false
+                            : true,
                         message: "Please enter the passphrase.",
                       },
                     ]}
