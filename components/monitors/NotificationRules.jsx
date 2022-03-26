@@ -20,20 +20,21 @@ const NotificationRulesPanel = ({ form, monitor }) => {
           ? "disabled"
           : "custom"
       );
+    else setCustom(undefined);
   }, [monitor]);
 
   return (
     <>
-      {custom ? (
+      {custom || custom === undefined ? (
         <Form.Item
           name="custom"
           label="Notification trigger events"
-          rules={[
-            {
-              required: true,
-              message: "Please enter a name for this monitor.",
-            },
-          ]}
+          //   rules={[
+          //     {
+          //       required: true,
+          //       message: "Please enter a name for this monitor.",
+          //     },
+          //   ]}
           valuePropName="value"
         >
           <Select
