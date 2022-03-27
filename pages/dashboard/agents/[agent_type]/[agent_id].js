@@ -17,7 +17,7 @@ import {
 const { Option } = Select;
 import Agent_dashboard from "../Agent_dashboard";
 import { useState, useEffect } from "react";
-import { secure_axios } from "../../../../helpers/auth";
+import { handle_error, secure_axios } from "../../../../helpers/auth";
 import { Router, useRouter } from "next/router";
 import Link from "next/link";
 import { snmp, types } from "../../../../helpers/agents/dict";
@@ -59,6 +59,44 @@ const agent_view = () => {
 
   const delete_agent = async () => {
     const loading = message.loading("Deleting agent...", 0);
+    let has_existing_monitors = false;
+    await secure_axios("/devices/enumerate/user", {}, router, (response) => {
+      if (response.accomplished) {
+        const devices = response.response;
+        for (let i = 0; i < devices.length; i++) {
+          const device = devices[i];
+          if (device.monitors[agent_id]) {
+            const monitor_listing = Object.values(device.monitors[agent_id]);
+            for (let j = 0; j < monitor_listing.length; j++) {
+              const monitors = Object.values(monitor_listing[j]);
+              if (monitors.includes(true)) {
+                has_existing_monitors = true;
+                break;
+              }
+            }
+
+            if (has_existing_monitors) {
+              break;
+            }
+          }
+        }
+      } else {
+        handle_error(response);
+        loading();
+        return;
+      }
+    });
+
+    console.log(has_existing_monitors, "MONITORS");
+
+    if (has_existing_monitors) {
+      message.error(
+        "This agent is currently being monitored by a device. Please remove the agent from the device before deleting."
+      );
+      loading();
+      return;
+    }
+
     await secure_axios(
       `/agents/delete/${agent_type}`,
       { agent_id: agent_id },
