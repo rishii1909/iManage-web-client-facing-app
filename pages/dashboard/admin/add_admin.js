@@ -10,9 +10,9 @@ import {
 } from "antd";
 import router from "next/router";
 import { useState } from "react";
-import RightAlignedButtonWrapper from "../../components/ui/RetentionSchedulePanel";
-import { handle_error, secure_axios } from "../../helpers/auth";
-import Dashboard from "./layout/layout";
+import RightAlignedButtonWrapper from "../../../components/ui/RetentionSchedulePanel";
+import { handle_error, secure_axios } from "../../../helpers/auth";
+import Dashboard from "../layout/layout";
 
 const AddAdmin = () => {
   const [form] = Form.useForm();
