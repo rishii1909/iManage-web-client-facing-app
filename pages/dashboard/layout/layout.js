@@ -115,6 +115,8 @@ export default function dashboard({ domain, subdomain, children }) {
     });
   }
 
+   
+
   const base_route = "/dashboard";
   const UserLogout = (e) => {
     logout();
@@ -179,6 +181,9 @@ export default function dashboard({ domain, subdomain, children }) {
                 {" "}
                 <Link href={`${base_route}/agents`}>Agents</Link>{" "}
               </Menu.Item>
+              <Menu.Item key="subscription">
+                  <a  target='_blank' href='http://imanage.host:4000/'>Subscription</a>
+                </Menu.Item>
               <SubMenu key="grouping" title="Groups">
                 <Menu.Item key="device_groups">
                   {" "}
@@ -186,6 +191,7 @@ export default function dashboard({ domain, subdomain, children }) {
                     Device Groups
                   </Link>{" "}
                 </Menu.Item>
+               
               </SubMenu>
             </Menu>
           </Sider>
