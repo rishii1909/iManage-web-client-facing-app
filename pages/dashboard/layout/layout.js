@@ -186,10 +186,6 @@ export default function dashboard({ domain, subdomain, children }) {
                 </Menu.Item>
               </SubMenu>
               <SubMenu key={"admin"} title={"Admin"}>
-                <Menu.Item key={"add_admins"} icon={<UsergroupAddOutlined />}>
-                  <Link href={`${base_route}/admin/add_admin`}>Add Admin</Link>
-                </Menu.Item>
-
                 <Menu.Item key={"view_profiles"} icon={<EyeOutlined />}>
                   <Link href={`${base_route}/admin/view_admins`}>
                     View Profiles
