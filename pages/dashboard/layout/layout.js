@@ -22,6 +22,7 @@ import {
   SwapRightOutlined,
   UsergroupAddOutlined,
   UserOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
@@ -141,9 +142,6 @@ export default function dashboard({ domain, subdomain, children }) {
                   <Menu.Item icon={<UserOutlined />}>
                     <Link href={`${base_route}/profile`}>Profile</Link>
                   </Menu.Item>
-                  <Menu.Item icon={<UsergroupAddOutlined />}>
-                    <Link href={`${base_route}/add_admin`}>Add Admin</Link>
-                  </Menu.Item>
                   <Menu.Item onClick={UserLogout} icon={<LogoutOutlined />}>
                     Log out
                   </Menu.Item>
@@ -154,7 +152,7 @@ export default function dashboard({ domain, subdomain, children }) {
         </Header>
         <Layout>
           <Sider
-            width={200}
+            width={250}
             className="site-layout-background"
             collapsible={true}
           >
@@ -192,6 +190,19 @@ export default function dashboard({ domain, subdomain, children }) {
                   </Link>{" "}
                 </Menu.Item>
                
+              </SubMenu>
+              <SubMenu key={"admin"} title={"Admin"}>
+                <Menu.Item key={"view_profiles"} icon={<EyeOutlined />}>
+                  <Link href={`${base_route}/admin/view_admins`}>
+                    View Profiles
+                  </Link>
+                </Menu.Item>
+
+                <Menu.Item key={"team_secret"} icon={<EyeOutlined />}>
+                  <Link href={`${base_route}/admin/team_secret_key`}>
+                    Team Secret Key
+                  </Link>
+                </Menu.Item>
               </SubMenu>
             </Menu>
           </Sider>
