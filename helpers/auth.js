@@ -43,7 +43,7 @@ exports.secure_axios = (path, postData, router, successCallback) => {
   return axios
     .post(
       `${process.env.API_URL}${path}`,
-      { ...postData, ...{ user_id: data.user_id, team_id: data.team_id } },
+      { user_id: data.user_id, team_id: data.team_id, ...postData },
       {
         headers: {
           Authorization: "Bearer " + (data ? data.auth_token : ""),
