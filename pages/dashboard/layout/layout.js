@@ -180,7 +180,8 @@ export default function dashboard({ domain, subdomain, children }) {
                 <Link href={`${base_route}/agents`}>Agents</Link>{" "}
               </Menu.Item>
               <Menu.Item key="subscription">
-                  <a  target='_blank' href='http://imanage.host:4000/'>Subscription</a>
+              <Link  href={`${base_route}/subscription`}>Subscription</Link> 
+                  {/* <a  target='_blank' href='http://imanage.host:4000/'>Subscription</a> */}
                 </Menu.Item>
               <SubMenu key="grouping" title="Groups">
                 <Menu.Item key="device_groups">
