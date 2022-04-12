@@ -219,7 +219,7 @@ const device_view = () => {
 
     secure_axios(
       `/monitors/delete/${device_type}`,
-      { monitor_id },
+      { monitor_id, agent_id },
       router,
       (r) => {
         if (r.accomplished) {
@@ -332,7 +332,7 @@ const device_view = () => {
                       );
                     }}
                   >
-                    Delete
+                    Delete Monitor
                   </Button>
                   {/* <Tag color={monitor.active ? "success" : "error"}>{monitor.active ? "Active" : "Inactive"}</Tag> */}
                 </List.Item>
