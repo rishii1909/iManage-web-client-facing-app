@@ -319,7 +319,7 @@ const device_view = () => {
                     </Col>
                   </Row>
                   {/* <Tag>{monitor_types[monitor.type]}</Tag> */}
-                  <Tag color="blue">{monitor.monitor_ref}</Tag>
+                  {/* <Tag color="blue">{monitor.monitor_ref}</Tag> */}
                   <Button
                     type="danger"
                     icon={<DeleteFilled />}
