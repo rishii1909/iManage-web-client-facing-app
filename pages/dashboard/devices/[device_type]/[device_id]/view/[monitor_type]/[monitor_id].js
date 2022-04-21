@@ -1,43 +1,32 @@
+import { PlusSquareFilled } from "@ant-design/icons";
 import {
-  Form,
+  Breadcrumb,
   Button,
+  Collapse,
+  Divider,
+  Form,
   message,
   Select,
-  Breadcrumb,
   Tabs,
-  List,
-  Switch,
-  Divider,
 } from "antd";
-
-const { Option } = Select;
-import Device_dashboard from "../../../../Device_dashboard";
-import { useState, useEffect } from "react";
-import { handle_error, secure_axios } from "../../../../../../../helpers/auth";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import { snmp, types } from "../../../../../../../helpers/devices/dict";
 import BreadcrumbItem from "antd/lib/breadcrumb/BreadcrumbItem";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import AssignAdminsPanel from "../../../../../../../components/monitors/AssignAdmins";
+import NotificationRulesPanel from "../../../../../../../components/monitors/NotificationRules";
+import RetentionSchedulePanel from "../../../../../../../components/monitors/RetentionSchedulePanel";
+import DetailsPanel from "../../../../../../../components/monitor_panels";
+import RightAlignedButtonWrapper from "../../../../../../../components/ui/RetentionSchedulePanel";
+import { handle_error, secure_axios } from "../../../../../../../helpers/auth";
 import {
   capitalizeFirstLetter,
   monitor_types,
 } from "../../../../../../../helpers/format";
-import {
-  DownOutlined,
-  PlusCircleFilled,
-  PlusOutlined,
-  PlusSquareFilled,
-  UpOutlined,
-} from "@ant-design/icons";
-import DetailsPanel from "../../../../../../../components/monitor_panels";
-import { Collapse } from "antd";
-import RightAlignedButtonWrapper from "../../../../../../../components/ui/RetentionSchedulePanel";
-import RetentionSchedulePanel from "../../../../../../../components/monitors/RetentionSchedulePanel";
-import NotificationRulesPanel from "../../../../../../../components/monitors/NotificationRules";
-import NotificationTemplatePanel from "../../../../../../../components/monitors/NotificationTemplate";
-import dynamic from "next/dynamic";
-import AssignAdminsPanel from "../../../../../../../components/monitors/AssignAdmins";
-import { Line } from "@ant-design/charts";
+import Device_dashboard from "../../../../Device_dashboard";
+
+const { Option } = Select;
 
 var valid_monitors = [
   "uptime_monitor",
@@ -72,6 +61,12 @@ const create_monitor_view = () => {
   const [agent, setAgent] = useState(null);
   const [retention_schedule, setRetention_schedule] = useState(null);
   const [form] = Form.useForm();
+
+  const [defaultTabKey, setDefaultTabKey] = useState("");
+
+  useEffect(() => {
+    setDefaultTabKey(router.query.tab || "monitor_details");
+  }, [router]);
 
   if (typeof window !== "undefined" && monitor_type) {
     if (valid_monitors.includes(monitor_type)) {
@@ -254,139 +249,145 @@ const create_monitor_view = () => {
       </Breadcrumb>
 
       {/* <Tabs style={{minHeight : '100vh'}} activeKey="monitor_aggregates"> */}
-      <Tabs style={{ minHeight: "100vh" }} defaultActiveKey="monitor_details">
-        <TabPane
-          tab={`${monitor ? monitor.label : "Monitor"} aggregates`}
-          key="monitor_aggregates"
+      {defaultTabKey && (
+        <Tabs
+          style={{ minHeight: "100vh" }}
+          key={defaultTabKey}
+          defaultActiveKey={defaultTabKey}
         >
-          <div style={{ height: "100%" }}>
-            {MonitorAggregatesPanel && (
-              <MonitorAggregatesPanel
-                monitor={monitor && monitor}
-                device_id={metaData && metaData.device_id}
-                agent_id={agent && agent._id}
-              />
-            )}
-          </div>
-        </TabPane>
-        <TabPane tab="Monitor details" key="monitor_details">
-          {/* <Link href={`/dashboard/devices/${"device_type"}/${device_id}/monitors/add`}>
+          <TabPane
+            tab={`${monitor ? monitor.label : "Monitor"} aggregates`}
+            key="monitor_aggregates"
+          >
+            <div style={{ height: "100%" }}>
+              {MonitorAggregatesPanel && (
+                <MonitorAggregatesPanel
+                  monitor={monitor && monitor}
+                  device_id={metaData && metaData.device_id}
+                  agent_id={agent && agent._id}
+                />
+              )}
+            </div>
+          </TabPane>
+          <TabPane tab="Monitor details" key="monitor_details">
+            {/* <Link href={`/dashboard/devices/${"device_type"}/${device_id}/monitors/add`}>
                       <Button type="primary" icon={<PlusOutlined/>} >
                         Add a monitor
                       </Button>
                     </Link>
                     <br></br>
                     <br></br> */}
-          <Form
-            form={form}
-            preserve={false}
-            colon={false}
-            {...layout}
-            layout="horizontal"
-            onFinish={on_finish}
-            onFinishFailed={on_finish_failed}
-            autoComplete="off"
-            labelAlign="left"
-            labelCol={{ span: 5 }}
-            requiredMark={false}
-            // onFieldsChange={(fields)=>console.log(fields)}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              flexFlow: "column",
-            }}
-          >
-            <Collapse defaultActiveKey={accordion}>
-              <Panel forceRender header="Details" key={0}>
-                {device_type && (
-                  <DetailsPanel
-                    device_type={device_type}
-                    monitor_type={
-                      monitor_type ? monitor_types[monitor_type] : ""
-                    }
-                    device_name={device && device.name}
-                    agentCallback={setAgent_id}
-                    agent={agent}
-                    remote_data={monitor}
-                    metadata={metaData}
-                  ></DetailsPanel>
-                )}
-                <RightAlignedButtonWrapper>
-                  {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion([0,1])}>Next</Button> */}
-                </RightAlignedButtonWrapper>
-              </Panel>
-              <Panel forceRender header="Settings" key={1}>
-                {MonitorSettingsPanel && (
-                  <MonitorSettingsPanel
-                    {...(monitor && monitor.url
-                      ? { hostname: monitor.url }
-                      : {})}
-                    device_id={device_id}
-                    device_type={device_type}
-                    monitor_type={
-                      monitor_type ? monitor_types[monitor_type] : ""
-                    }
-                    device_name={device && device.name}
-                    agent_id={agent_id}
+            <Form
+              form={form}
+              preserve={false}
+              colon={false}
+              {...layout}
+              layout="horizontal"
+              onFinish={on_finish}
+              onFinishFailed={on_finish_failed}
+              autoComplete="off"
+              labelAlign="left"
+              labelCol={{ span: 5 }}
+              requiredMark={false}
+              // onFieldsChange={(fields)=>console.log(fields)}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                flexFlow: "column",
+              }}
+            >
+              <Collapse defaultActiveKey={accordion}>
+                <Panel forceRender header="Details" key={0}>
+                  {device_type && (
+                    <DetailsPanel
+                      device_type={device_type}
+                      monitor_type={
+                        monitor_type ? monitor_types[monitor_type] : ""
+                      }
+                      device_name={device && device.name}
+                      agentCallback={setAgent_id}
+                      agent={agent}
+                      remote_data={monitor}
+                      metadata={metaData}
+                    ></DetailsPanel>
+                  )}
+                  <RightAlignedButtonWrapper>
+                    {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion([0,1])}>Next</Button> */}
+                  </RightAlignedButtonWrapper>
+                </Panel>
+                <Panel forceRender header="Settings" key={1}>
+                  {MonitorSettingsPanel && (
+                    <MonitorSettingsPanel
+                      {...(monitor && monitor.url
+                        ? { hostname: monitor.url }
+                        : {})}
+                      device_id={device_id}
+                      device_type={device_type}
+                      monitor_type={
+                        monitor_type ? monitor_types[monitor_type] : ""
+                      }
+                      device_name={device && device.name}
+                      agent_id={agent_id}
+                      form={form}
+                    />
+                  )}
+                  <RightAlignedButtonWrapper>
+                    {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(0)}>Previous</Button> */}
+                    {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion([0,1,2])}>Next</Button> */}
+                  </RightAlignedButtonWrapper>
+                </Panel>
+                <Panel forceRender header="Log Settings" key={2}>
+                  <RetentionSchedulePanel
                     form={form}
+                    retention_schedule={retention_schedule}
                   />
-                )}
-                <RightAlignedButtonWrapper>
-                  {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(0)}>Previous</Button> */}
-                  {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion([0,1,2])}>Next</Button> */}
-                </RightAlignedButtonWrapper>
-              </Panel>
-              <Panel forceRender header="Log Settings" key={2}>
-                <RetentionSchedulePanel
-                  form={form}
-                  retention_schedule={retention_schedule}
-                />
-                <RightAlignedButtonWrapper>
-                  {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(1)}>Previous</Button> */}
-                  {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion()}>Next</Button> */}
-                </RightAlignedButtonWrapper>
-              </Panel>
-              {/* <Panel forceRender header="Notification Template" key={3}>
+                  <RightAlignedButtonWrapper>
+                    {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(1)}>Previous</Button> */}
+                    {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion()}>Next</Button> */}
+                  </RightAlignedButtonWrapper>
+                </Panel>
+                {/* <Panel forceRender header="Notification Template" key={3}>
                                 <NotificationTemplatePanel template_id={template && template._id} />
                                 <RightAlignedButtonWrapper>
                                     <Button icon={<UpOutlined/>} onClick={()=>setAccordion(2)}>Previous</Button>
                                     <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(4)}>Next</Button>
                                 </RightAlignedButtonWrapper>
                             </Panel> */}
-              <Panel forceRender header="Notification Rules" key={4}>
-                <NotificationRulesPanel form={form} monitor={monitor} />
-                <RightAlignedButtonWrapper>
-                  {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(3)}>Previous</Button> */}
-                  {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(5)}>Next</Button> */}
-                </RightAlignedButtonWrapper>
-              </Panel>
-              <Panel forceRender header="Assign Admins" key={5}>
-                <RightAlignedButtonWrapper>
-                  {/* <Switch checkedChildren="Assigned" unCheckedChildren="All" onChange={(e)=> setAdmins_checked(e)} checked={admins_checked}></Switch> */}
-                </RightAlignedButtonWrapper>
+                <Panel forceRender header="Notification Rules" key={4}>
+                  <NotificationRulesPanel form={form} monitor={monitor} />
+                  <RightAlignedButtonWrapper>
+                    {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(3)}>Previous</Button> */}
+                    {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(5)}>Next</Button> */}
+                  </RightAlignedButtonWrapper>
+                </Panel>
+                <Panel forceRender header="Assign Admins" key={5}>
+                  <RightAlignedButtonWrapper>
+                    {/* <Switch checkedChildren="Assigned" unCheckedChildren="All" onChange={(e)=> setAdmins_checked(e)} checked={admins_checked}></Switch> */}
+                  </RightAlignedButtonWrapper>
 
-                <AssignAdminsPanel form={form} />
+                  <AssignAdminsPanel form={form} />
 
-                <RightAlignedButtonWrapper>
-                  {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(4)}>Previous</Button> */}
-                  {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(5)}>Next</Button> */}
-                </RightAlignedButtonWrapper>
-              </Panel>
-            </Collapse>
-            <Divider />
-            <RightAlignedButtonWrapper>
-              <Button
-                type="primary"
-                htmlType="submit"
-                icon={<PlusSquareFilled />}
-              >
-                {" "}
-                Update Monitor
-              </Button>
-            </RightAlignedButtonWrapper>
-          </Form>
-        </TabPane>
-      </Tabs>
+                  <RightAlignedButtonWrapper>
+                    {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(4)}>Previous</Button> */}
+                    {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(5)}>Next</Button> */}
+                  </RightAlignedButtonWrapper>
+                </Panel>
+              </Collapse>
+              <Divider />
+              <RightAlignedButtonWrapper>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  icon={<PlusSquareFilled />}
+                >
+                  {" "}
+                  Update Monitor
+                </Button>
+              </RightAlignedButtonWrapper>
+            </Form>
+          </TabPane>
+        </Tabs>
+      )}
     </Device_dashboard>
   );
 };
