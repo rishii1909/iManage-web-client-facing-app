@@ -1,33 +1,31 @@
-import { useState, useEffect } from "react";
-import {
-  Row,
-  Col,
-  Layout,
-  Menu,
-  Drawer,
-  List,
-  Empty,
-  Space,
-  Button,
-  Tag,
-  message,
-  Divider,
-} from "antd";
 import {
   BellOutlined,
-  SettingOutlined,
-  DeleteOutlined,
+  DeleteOutlined, DollarCircleOutlined, EyeOutlined,
   LogoutOutlined,
+  ReconciliationOutlined,
   ReloadOutlined,
+  SettingOutlined,
   SwapRightOutlined,
-  UsergroupAddOutlined,
-  UserOutlined,
-  EyeOutlined,
+  UserOutlined
 } from "@ant-design/icons";
+import {
+  Button,
+  Col,
+  Divider,
+  Drawer,
+  Empty,
+  Layout,
+  List,
+  Menu,
+  message,
+  Row,
+  Tag
+} from "antd";
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
-import { handle_error, logout, secure_axios } from "../../../helpers/auth";
+import { useEffect, useState } from "react";
 import AuthWrapper from "../../../components/AuthWrapper";
+import { handle_error, logout, secure_axios } from "../../../helpers/auth";
 
 const { Header, Content, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -116,8 +114,6 @@ export default function dashboard({ domain, subdomain, children }) {
     });
   }
 
-   
-
   const base_route = "/dashboard";
   const UserLogout = (e) => {
     logout();
@@ -141,6 +137,14 @@ export default function dashboard({ domain, subdomain, children }) {
                 <SubMenu icon={<SettingOutlined />} title="Settings">
                   <Menu.Item icon={<UserOutlined />}>
                     <Link href={`${base_route}/profile`}>Profile</Link>
+                  </Menu.Item>
+                  <Menu.Item icon={<ReconciliationOutlined />}>
+                    <Link href={`${base_route}/templates`}>Templates</Link>
+                  </Menu.Item>
+                  <Menu.Item icon={<DollarCircleOutlined /> }>
+                    <Link href={`${base_route}/subscription`}>
+                      Subscription
+                    </Link>
                   </Menu.Item>
                   <Menu.Item onClick={UserLogout} icon={<LogoutOutlined />}>
                     Log out
@@ -171,27 +175,18 @@ export default function dashboard({ domain, subdomain, children }) {
                 {" "}
                 <Link href={`${base_route}/devices`}>Devices</Link>{" "}
               </Menu.Item>
-              <Menu.Item key="templates">
-                {" "}
-                <Link href={`${base_route}/templates`}>Templates</Link>{" "}
-              </Menu.Item>
               <Menu.Item key="agents">
                 {" "}
                 <Link href={`${base_route}/agents`}>Agents</Link>{" "}
               </Menu.Item>
-              <Menu.Item key="subscription">
-              <Link  href={`${base_route}/subscription`}>Subscription</Link> 
-                  {/* <a  target='_blank' href='http://imanage.host:4000/'>Subscription</a> */}
-                </Menu.Item>
-              <SubMenu key="grouping" title="Groups">
+              {/* <SubMenu key="grouping" title="Groups">
                 <Menu.Item key="device_groups">
                   {" "}
                   <Link href={`${base_route}/device_groups`}>
                     Device Groups
                   </Link>{" "}
                 </Menu.Item>
-               
-              </SubMenu>
+              </SubMenu> */}
               <SubMenu key={"admin"} title={"Admin"}>
                 <Menu.Item key={"view_profiles"} icon={<EyeOutlined />}>
                   <Link href={`${base_route}/admin/view_admins`}>
