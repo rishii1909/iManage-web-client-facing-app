@@ -4,6 +4,8 @@ import {
   LoadingOutlined,
   LoginOutlined,
   MinusCircleFilled,
+  PieChartOutlined,
+  TableOutlined,
   WarningFilled,
 } from "@ant-design/icons";
 import {
@@ -16,12 +18,14 @@ import {
   Row,
   Spin,
   Statistic,
+  Table,
+  Tabs,
   Tag,
 } from "antd";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
-import { handle_error, secure_axios } from "../../helpers/auth";
+import { secure_axios } from "../../helpers/auth";
 import styles from "./dashboard.module.css";
 import Dashboard from "./layout/layout";
 
@@ -51,6 +55,8 @@ const DashboardIndex = () => {
   const [loaded_two_states, setLoaded_two_states] = useState(false);
   const [loaded_three_states, setLoaded_three_states] = useState(false);
   const [level_2, setLevel_2] = useState([]);
+  const [level2ColumnsData, setLevel2ColumnsData] = useState([]);
+  const [level2SourceData, setLevel2SourceData] = useState([]);
   const [level_3, setLevel_3] = useState([]);
   const [level_2_state, setLevel_2_state] = useState(null);
   const [level_3_state, setLevel_3_state] = useState(null);
@@ -141,7 +147,7 @@ const DashboardIndex = () => {
     });
   }
 
-  function level_two(state) {
+  const level_two = (state) => {
     setActiveState(state);
     const dash = dashboard.level_2[`${state == 2 ? "two" : "three"}_states`];
     const two_keys = Object.keys(dash);
@@ -167,17 +173,72 @@ const DashboardIndex = () => {
       });
     });
     console.log(two_keys_arr);
+
     setLevel_2(two_keys_arr);
     setLevel_2_state(state);
     setLevel_3([]);
     ref_level_2.current.scrollIntoView();
-  }
+  };
 
-  function level_three(key) {
+  const setLevelTwoTableData = () => {
+    let level2TableColumns = [
+      {
+        title: "Hostname",
+        dataIndex: "key",
+        width: "60%",
+      },
+    ];
+    level_2[0].states.forEach(({ type }) => {
+      if (type) {
+        level2TableColumns.push({
+          title: type,
+          dataIndex: type,
+          align: "center",
+        });
+      }
+    });
+
+    level2TableColumns.push({
+      title: "Action",
+      // dataIndex: "action",
+      // key: "action",
+      render: (text, record) => {
+        return (
+          <Button onClick={() => level_three(record.key, level_2_state)}>
+            View Monitors
+          </Button>
+        );
+      },
+      align: "right",
+    });
+
+    let level2Data = [];
+    level_2.forEach(({ key, states }, index) => {
+      level2Data[index] = {
+        key,
+      };
+
+      states.forEach(({ type, monitors }) => {
+        level2Data[index] = {
+          ...level2Data[index],
+          [type]: monitors,
+        };
+      });
+    });
+
+    console.log(level2TableColumns);
+
+    setLevel2ColumnsData(level2TableColumns);
+    setLevel2SourceData(level2Data);
+  };
+
+  function level_three(key, level_2_state_temp) {
     setLevel_3_state(key);
+    console.log(key, level_2_state_temp);
     // return console.log(dashboard.level_3)
     const dash =
       dashboard.level_3[`${level_2_state == 2 ? "two" : "three"}_states`][key];
+    console.log(dash);
     const monitors = [];
     for (const monitor_key in dash) {
       if (Object.hasOwnProperty.call(dash, monitor_key)) {
@@ -381,6 +442,12 @@ const DashboardIndex = () => {
     );
   };
 
+  useEffect(() => {
+    if (level_2?.length && level_2_state) {
+      setLevelTwoTableData();
+    }
+  }, [level_2_state, level_2]);
+
   return (
     <Dashboard>
       <div style={{ display: "flex", flexFlow: "column" }}>
@@ -443,36 +510,86 @@ const DashboardIndex = () => {
               style={{ padding: "0px" }}
               title={level_2_state + " state monitors"}
             />
+
+            <Tabs defaultActiveKey={"chart_view"}>
+              <Tabs.TabPane
+                tab={
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <PieChartOutlined />
+                    Chart View
+                  </div>
+                }
+                key={"chart_view"}
+              >
+                <Row
+                  justify="space-evenly"
+                  align="top"
+                  style={{ paddingTop: "1em" }}
+                  ref={ref_level_2}
+                >
+                  {level_2.map((host) => (
+                    <>
+                      <Col
+                        span={6}
+                        className={styles["monitor_box"]}
+                        onClick={() => level_three(host.key)}
+                      >
+                        <h3
+                          style={{ textAlign: "center", paddingRight: "12%" }}
+                        >
+                          {host.key}
+                        </h3>
+                        <Pie
+                          {...level_2_config(host)}
+                          // width={250}
+                          // height={220}
+
+                          data={host.states}
+                          style={{ margin: "0px" }}
+                        />
+                      </Col>
+                    </>
+                  ))}
+                </Row>
+              </Tabs.TabPane>
+
+              <Tabs.TabPane
+                tab={
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <TableOutlined />
+                    Table View
+                  </div>
+                }
+                key={"table_view"}
+              >
+                <Table
+                  columns={level2ColumnsData}
+                  dataSource={level2SourceData}
+                />
+                {/* <Table.Column width={"80%"} title={"Hostname"} /> */}
+                {/* <Table.Column
+                title={"Monitors Up"}
+                render={(text, record) => {
+                  return <>{record.states[0].monitors}</>;
+                }}
+                // render={(text, r3ecord) => {
+                //   return <>M</>;
+                // }}
+              /> */}
+              </Tabs.TabPane>
+            </Tabs>
           </>
         )}
-        <Row
-          justify="space-evenly"
-          align="top"
-          style={{ paddingTop: "1em" }}
-          ref={ref_level_2}
-        >
-          {level_2.map((host) => (
-            <>
-              <Col
-                span={6}
-                className={styles["monitor_box"]}
-                onClick={() => level_three(host.key)}
-              >
-                <h3 style={{ textAlign: "center", paddingRight: "12%" }}>
-                  {host.key}
-                </h3>
-                <Pie
-                  {...level_2_config(host)}
-                  // width={250}
-                  // height={220}
-
-                  data={host.states}
-                  style={{ margin: "0px" }}
-                />
-              </Col>
-            </>
-          ))}
-        </Row>
       </div>
       <div>
         {level_3.length > 0 && (
