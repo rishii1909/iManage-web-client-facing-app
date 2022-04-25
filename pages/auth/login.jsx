@@ -11,6 +11,8 @@ import {
   UserOutlined,
   LockOutlined,
   MailOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
 } from "@ant-design/icons";
 import { Header } from "antd/lib/layout/layout";
 import axios from "axios";
@@ -25,6 +27,11 @@ export default function login_form() {
   const [otp_sent, setOtp_sent] = useState(false);
   const [otp_verified, setOtp_verified] = useState(false);
   const [password, setPassword] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const toggleShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   const onFinish = (values) => {
     axios
@@ -149,9 +156,27 @@ export default function login_form() {
                 >
                   <Input
                     prefix={<LockOutlined className="site-form-item-icon" />}
-                    type="password"
-                    value="Reset123!"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Password"
+                    suffix={
+                      showPassword ? (
+                        <EyeInvisibleOutlined
+                          style={{
+                            cursor: "pointer",
+                          }}
+                          onClick={toggleShowPassword}
+                          className="site-form-item-icon"
+                        />
+                      ) : (
+                        <EyeOutlined
+                          style={{
+                            cursor: "pointer",
+                          }}
+                          onClick={toggleShowPassword}
+                          className="site-form-item-icon"
+                        />
+                      )
+                    }
                   />
                 </Form.Item>
                 <Form.Item>
