@@ -3,6 +3,7 @@ import { Button, Checkbox, Col, Form, Input, message, Space } from "antd";
 import axios from "axios";
 import Router from "next/router";
 import React, { useState } from "react";
+import UnauthorizedLayer from "../../components/UnauthorizedLayer";
 import { handle_error } from "../../helpers/auth";
 import styles from "./login.module.css";
 
@@ -110,140 +111,37 @@ export default function register_form() {
   };
 
   return (
-    <div className={styles.container}>
-      <Col span={8} className={styles.login_box}>
-        <Form
-          name="normal_login"
-          initialValues={{
-            remember: true,
-          }}
-          onFinish={onFinish}
-        >
-          <>
-            <h1 style={{ textAlign: "center" }}>Create an account</h1>
-            <Form.Item
-              name="email"
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter your email.",
-                },
-              ]}
-            >
-              <Input
-                prefix={<UserOutlined className="site-form-item-icon" />}
-                value={email}
-                disabled={otp_sent}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-              />
-            </Form.Item>
-
-            {!otp_sent && (
-              <Form.Item>
-                <Space
-                  align="center"
-                  style={{ width: "100%", justifyContent: "center" }}
-                >
-                  <Button
-                    type="primary"
-                    onClick={() => send_otp()}
-                    className={styles.login_button}
-                  >
-                    Send verification code
-                  </Button>
-                </Space>
+    <UnauthorizedLayer>
+      <div className={styles.container}>
+        <Col span={8} className={styles.login_box}>
+          <Form
+            name="normal_login"
+            initialValues={{
+              remember: true,
+            }}
+            onFinish={onFinish}
+          >
+            <>
+              <h1 style={{ textAlign: "center" }}>Create an account</h1>
+              <Form.Item
+                name="email"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter your email.",
+                  },
+                ]}
+              >
+                <Input
+                  prefix={<UserOutlined className="site-form-item-icon" />}
+                  value={email}
+                  disabled={otp_sent}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email"
+                />
               </Form.Item>
-            )}
 
-            {otp_sent && (
-              <>
-                <Form.Item name="verify_otp">
-                  <Input
-                    value={otp_verify}
-                    disabled={otp_verified}
-                    onChange={(e) => setOtp_verify(e.target.value)}
-                    placeholder="Enter verification token"
-                  />
-                </Form.Item>
-              </>
-            )}
-
-            {!otp_verified && otp_sent && (
-              <Form.Item>
-                <Space
-                  align="center"
-                  style={{ width: "100%", justifyContent: "center" }}
-                >
-                  <Button
-                    type="primary"
-                    onClick={() => verify_otp()}
-                    className={styles.login_button}
-                  >
-                    Verify code
-                  </Button>
-                </Space>
-              </Form.Item>
-            )}
-
-            {otp_verified && otp_sent && (
-              <>
-                <Form.Item
-                  name="name"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter your name.",
-                    },
-                  ]}
-                >
-                  <Input
-                    prefix={<UserOutlined className="site-form-item-icon" />}
-                    placeholder="Your Name"
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="password"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter your password.",
-                    },
-                  ]}
-                >
-                  <Input
-                    prefix={<LockOutlined className="site-form-item-icon" />}
-                    type="password"
-                    placeholder="Password"
-                  />
-                </Form.Item>
-
-                <Form.Item name={"has_team_secret"} valuePropName={"checked"}>
-                  <Checkbox
-                    checked={hasTeamSecret}
-                    onChange={(e) => setHasTeamSecret(e.target.checked)}
-                  >
-                    Join An Existing Team?
-                  </Checkbox>
-                </Form.Item>
-
-                {hasTeamSecret && (
-                  <Form.Item
-                    name={"team_secret"}
-                    label={"Team Secret"}
-                    rules={[
-                      {
-                        required: true,
-                        message:
-                          "Please enter the team secret for the team you want to join.",
-                      },
-                    ]}
-                  >
-                    <Input type={"text"} placeholder={"Ex: SwVs_deTT"} />
-                  </Form.Item>
-                )}
-
+              {!otp_sent && (
                 <Form.Item>
                   <Space
                     align="center"
@@ -251,18 +149,123 @@ export default function register_form() {
                   >
                     <Button
                       type="primary"
-                      htmlType="submit"
+                      onClick={() => send_otp()}
                       className={styles.login_button}
                     >
-                      Create Account
+                      Send verification code
                     </Button>
                   </Space>
                 </Form.Item>
-              </>
-            )}
-          </>
-        </Form>
-      </Col>
-    </div>
+              )}
+
+              {otp_sent && (
+                <>
+                  <Form.Item name="verify_otp">
+                    <Input
+                      value={otp_verify}
+                      disabled={otp_verified}
+                      onChange={(e) => setOtp_verify(e.target.value)}
+                      placeholder="Enter verification token"
+                    />
+                  </Form.Item>
+                </>
+              )}
+
+              {!otp_verified && otp_sent && (
+                <Form.Item>
+                  <Space
+                    align="center"
+                    style={{ width: "100%", justifyContent: "center" }}
+                  >
+                    <Button
+                      type="primary"
+                      onClick={() => verify_otp()}
+                      className={styles.login_button}
+                    >
+                      Verify code
+                    </Button>
+                  </Space>
+                </Form.Item>
+              )}
+
+              {otp_verified && otp_sent && (
+                <>
+                  <Form.Item
+                    name="name"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter your name.",
+                      },
+                    ]}
+                  >
+                    <Input
+                      prefix={<UserOutlined className="site-form-item-icon" />}
+                      placeholder="Your Name"
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="password"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter your password.",
+                      },
+                    ]}
+                  >
+                    <Input
+                      prefix={<LockOutlined className="site-form-item-icon" />}
+                      type="password"
+                      placeholder="Password"
+                    />
+                  </Form.Item>
+
+                  <Form.Item name={"has_team_secret"} valuePropName={"checked"}>
+                    <Checkbox
+                      checked={hasTeamSecret}
+                      onChange={(e) => setHasTeamSecret(e.target.checked)}
+                    >
+                      Join An Existing Team?
+                    </Checkbox>
+                  </Form.Item>
+
+                  {hasTeamSecret && (
+                    <Form.Item
+                      name={"team_secret"}
+                      label={"Team Secret"}
+                      rules={[
+                        {
+                          required: true,
+                          message:
+                            "Please enter the team secret for the team you want to join.",
+                        },
+                      ]}
+                    >
+                      <Input type={"text"} placeholder={"Ex: SwVs_deTT"} />
+                    </Form.Item>
+                  )}
+
+                  <Form.Item>
+                    <Space
+                      align="center"
+                      style={{ width: "100%", justifyContent: "center" }}
+                    >
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        className={styles.login_button}
+                      >
+                        Create Account
+                      </Button>
+                    </Space>
+                  </Form.Item>
+                </>
+              )}
+            </>
+          </Form>
+        </Col>
+      </div>
+    </UnauthorizedLayer>
   );
 }
