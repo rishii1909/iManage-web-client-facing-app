@@ -16,7 +16,7 @@ const NotificationRulesPanel = ({ form, monitor }) => {
       setCustom(
         monitor?.notification_rules?.alert_all == true
           ? "every"
-          : monitor?.notification_rules?.alert_rules.every == 1
+          : monitor?.notification_rules?.alert_rules?.every == 1
           ? "disabled"
           : "custom"
       );
