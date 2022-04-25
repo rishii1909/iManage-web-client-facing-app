@@ -281,7 +281,9 @@ const create_monitor_view = () => {
               <Panel forceRender header="Details" key={0}>
                 {device_type && device && (
                   <DetailsPanel
+                    form={form}
                     device_type={device_type}
+                    device_agent={device.type}
                     monitor_type={
                       monitor_type ? monitor_types[monitor_type] : ""
                     }

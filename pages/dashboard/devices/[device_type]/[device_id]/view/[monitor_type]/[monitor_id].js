@@ -298,9 +298,11 @@ const create_monitor_view = () => {
             >
               <Collapse defaultActiveKey={accordion}>
                 <Panel forceRender header="Details" key={0}>
-                  {device_type && (
+                  {device_type && device && (
                     <DetailsPanel
                       device_type={device_type}
+                      device_agent={device.type === 2 ? 1 : device.type}
+                      form={form}
                       monitor_type={
                         monitor_type ? monitor_types[monitor_type] : ""
                       }
