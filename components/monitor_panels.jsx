@@ -72,10 +72,11 @@ const DetailsPanel = ({
 
   useEffect(() => {
     if (teamAgents?.length && form) {
-      form.setFieldsValue(
-        "agent_id",
-        teamAgents.find((agent) => agent.type === device_agent)?.["_id"]
-      );
+      form.setFieldsValue({
+        agent_id: teamAgents.find((agent) => agent.type === device_agent)?.[
+          "_id"
+        ],
+      });
     }
   }, [teamAgents, form]);
 
