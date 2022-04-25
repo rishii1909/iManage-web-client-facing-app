@@ -1,12 +1,14 @@
 import {
   BellOutlined,
-  DeleteOutlined, DollarCircleOutlined, EyeOutlined,
+  DeleteOutlined,
+  DollarCircleOutlined,
+  EyeOutlined,
   LogoutOutlined,
   ReconciliationOutlined,
   ReloadOutlined,
   SettingOutlined,
   SwapRightOutlined,
-  UserOutlined
+  UserOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -19,7 +21,7 @@ import {
   Menu,
   message,
   Row,
-  Tag
+  Tag,
 } from "antd";
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
@@ -141,7 +143,7 @@ export default function dashboard({ domain, subdomain, children }) {
                   <Menu.Item icon={<ReconciliationOutlined />}>
                     <Link href={`${base_route}/templates`}>Templates</Link>
                   </Menu.Item>
-                  <Menu.Item icon={<DollarCircleOutlined /> }>
+                  <Menu.Item icon={<DollarCircleOutlined />}>
                     <Link href={`${base_route}/subscription`}>
                       Subscription
                     </Link>
@@ -200,6 +202,10 @@ export default function dashboard({ domain, subdomain, children }) {
                   </Link>
                 </Menu.Item>
               </SubMenu>
+
+              <Menu.Item key="contact-us">
+                <Link href={`/contact-us`}>Contact Us</Link>
+              </Menu.Item>
             </Menu>
           </Sider>
           <Layout style={{ padding: "0.5em 2em", margin: "0px auto" }}>
