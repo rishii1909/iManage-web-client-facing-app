@@ -17,6 +17,7 @@
     "axios": "^0.23.0",
     "clone": "^2.1.2",
     "dotenv": "^10.0.0",
+    "emailjs-com": "^3.2.0",
     "fs": "^0.0.1-security",
     "less": "^4.1.2",
     "less-loader": "^10.1.0",
