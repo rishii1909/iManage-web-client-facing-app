@@ -1,20 +1,10 @@
-import Head from "next/head";
-import Image from "next/image";
-import Router from "next/router";
-import Link from "next/link";
-
-import React, { useState } from "react";
-import { Form, Input, Button, Checkbox, Row, Col, Space, message } from "antd";
-import styles from "./login.module.css";
-import {
-  InfoCircleOutlined,
-  UserOutlined,
-  LockOutlined,
-  MailOutlined,
-} from "@ant-design/icons";
-import { Header } from "antd/lib/layout/layout";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { Button, Checkbox, Col, Form, Input, message, Space } from "antd";
 import axios from "axios";
-import { getAccessToken, handle_error, setToken } from "../../helpers/auth";
+import Router from "next/router";
+import React, { useState } from "react";
+import { handle_error } from "../../helpers/auth";
+import styles from "./login.module.css";
 
 const validateEmail = (email) => {
   return String(email)
