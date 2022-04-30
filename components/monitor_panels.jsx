@@ -1,11 +1,4 @@
-const {
-  TimePicker,
-  Form,
-  Input,
-  Switch,
-  InputNumber,
-  Select,
-} = require("antd");
+const { TimePicker, Form, Input, Switch, Select } = require("antd");
 const { secure_axios } = require("../helpers/auth");
 const { Option } = Select;
 import * as moment from "moment";
@@ -138,6 +131,7 @@ const DetailsPanel = ({
                         </Select>
                     </Form.Item>
                 } */}
+
       <Form.Item
         name="label"
         labelCol={{ span: 5 }}
@@ -151,20 +145,20 @@ const DetailsPanel = ({
       </Form.Item>
       {host && (
         <Form.Item
-          name={host}
-          label="Name"
+          label="Host"
           rules={[{ required: true, message: "Please enter a hostname." }]}
+          initialValue={host}
         >
-          <Input name={host} placeholder="Enter hostname"></Input>
+          <Input readOnly placeholder={"Enter hostname"} value={host}></Input>
         </Form.Item>
       )}
-      <Form.Item
+      {/* <Form.Item
         name="pingInterval"
         label="Monitor logging interval"
         initialValue={60}
       >
         <InputNumber defaultValue={60} /> Seconds
-      </Form.Item>
+      </Form.Item> */}
       <Form.Item
         name="offline_time_1"
         labelCol={{ span: 5 }}
