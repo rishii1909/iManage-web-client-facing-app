@@ -116,10 +116,10 @@ const create_monitor_view = () => {
     }
 
     data.retention_schedule = {
-      raw_data: data.raw_data,
-      daily_aggr: data.daily_aggr,
-      weekly_aggr: data.weekly_aggr,
-      monthly_aggr: data.monthly_aggr,
+      raw_data: data.raw_data ? data.raw_data : 1,
+      daily_aggr: data.daily_aggr ? data.daily_aggr : 1,
+      weekly_aggr: data.weekly_aggr ? data.weekly_aggr : 1,
+      monthly_aggr: data.monthly_aggr ? data.monthly_aggr : 1,
       retsch_export: data.retsch_export,
     };
 
@@ -282,6 +282,7 @@ const create_monitor_view = () => {
                 {device_type && device && (
                   <DetailsPanel
                     form={form}
+                    host={device.host}
                     device_type={device_type}
                     device_agent={device.type}
                     monitor_type={

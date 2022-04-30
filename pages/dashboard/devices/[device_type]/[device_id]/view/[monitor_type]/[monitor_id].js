@@ -159,7 +159,18 @@ const create_monitor_view = () => {
         },
       };
     }
-    const merged = { monitor_id, ...data, ...device.creds, notification_rules };
+    const merged = {
+      monitor_id,
+      ...data,
+      ...device.creds,
+      notification_rules,
+      retention_schedule: {
+        raw_data: data.raw_data ? data.raw_data : 1,
+        daily_aggr: data.daily_aggr ? data.daily_aggr : 1,
+        weekly_aggr: data.weekly_aggr ? data.weekly_aggr : 1,
+        monthly_aggr: data.monthly_aggr ? data.monthly_aggr : 1,
+      },
+    };
     if (data.host) merged.host = data.host;
     merged.type = monitor_type;
     merged.device_id = device_id;
@@ -306,6 +317,7 @@ const create_monitor_view = () => {
                       monitor_type={
                         monitor_type ? monitor_types[monitor_type] : ""
                       }
+                      host={device.host}
                       device_name={device && device.name}
                       agentCallback={setAgent_id}
                       agent={agent}
@@ -341,7 +353,7 @@ const create_monitor_view = () => {
                 <Panel forceRender header="Log Settings" key={2}>
                   <RetentionSchedulePanel
                     form={form}
-                    retention_schedule={retention_schedule}
+                    retention_schedule={{ ...retention_schedule }}
                   />
                   <RightAlignedButtonWrapper>
                     {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(1)}>Previous</Button> */}
