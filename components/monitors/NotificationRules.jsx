@@ -10,51 +10,63 @@ const NotificationRulesPanel = ({ form, monitor }) => {
   const [otow, setotow] = useState(false);
   const [owtof_count_check, setOwtof_count_check] = useState(false);
   const [otow_count_check, setOtow_count_check] = useState(false);
+  // const [every_count, set]
 
   useEffect(() => {
-    if (monitor)
-      setCustom(
-        monitor?.notification_rules?.alert_all == true
-          ? "every"
-          : monitor?.notification_rules?.alert_rules?.every == 1
-          ? "disabled"
-          : "custom"
-      );
-    else setCustom(undefined);
-  }, [monitor]);
+    if (form) {
+      if (monitor)
+        setCustom(
+          monitor?.notification_rules?.alert_all == true
+            ? "every"
+            : monitor?.notification_rules?.alert_rules?.every == 1
+            ? "disabled"
+            : "custom"
+        );
+      else
+        form.setFieldsValue({
+          custom: "every",
+        });
+      form.setFieldsValue({
+        every_count: 1,
+      });
+      setCustom("every");
+    }
+  }, [monitor, form]);
 
   return (
     <>
-      {custom || custom === undefined ? (
-        <Form.Item
-          name="custom"
-          label="Notification trigger events"
-          //   rules={[
-          //     {
-          //       required: true,
-          //       message: "Please enter a name for this monitor.",
-          //     },
-          //   ]}
-          valuePropName="value"
+      {/* {custom || custom === undefined ? ( */}
+      <Form.Item
+        name="custom"
+        label="Notification trigger events"
+        //   rules={[
+        //     {
+        //       required: true,
+        //       message: "Please enter a name for this monitor.",
+        //     },
+        //   ]}
+        valuePropName="value"
+      >
+        <Select
+          placeholder="Select notification rules"
+          // defaultValue={custom}
+          // value={custom}
+          onChange={(val) => {
+            form.setFieldsValue({
+              custom: val,
+            });
+            setCustom(val);
+          }}
         >
-          <Select
-            placeholder="Select notification rules"
-            defaultValue={custom}
-            onChange={(val) => {
-              setCustom(val);
-            }}
-          >
-            <option value="every">
-              Alert after every given number of events
-            </option>
-            <option value="custom">Add custom configuration...</option>
-            <option value="disabled">Disable notifications</option>
-          </Select>
-        </Form.Item>
-      ) : (
-        <></>
-      )}
-
+          <option value="every">
+            Alert after every given number of events
+          </option>
+          <option value="custom">Add custom configuration...</option>
+          <option value="disabled">Disable notifications</option>
+        </Select>
+      </Form.Item>
+      <></>
+      {/* )} */}
       {custom === "every" && (
         <Form.Item
           name="every_count"
@@ -63,8 +75,13 @@ const NotificationRulesPanel = ({ form, monitor }) => {
         >
           <Select
             placeholder="Select number of trigger events"
+            // value={1}
             // value={custom}
-            // onChange={(val) => { setCustom(val); }}
+            onChange={(val) => {
+              form.setFieldsValue({
+                every_count: val,
+              });
+            }}
           >
             <Option value="1"> 1 </Option>
             <Option value="2"> 2 </Option>
@@ -72,7 +89,6 @@ const NotificationRulesPanel = ({ form, monitor }) => {
           </Select>
         </Form.Item>
       )}
-
       {custom === "custom" && (
         <Form.Item
           name="custom_config"
