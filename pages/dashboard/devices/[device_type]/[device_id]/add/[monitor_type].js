@@ -37,6 +37,7 @@ import NotificationRulesPanel from "../../../../../../components/monitors/Notifi
 import NotificationTemplatePanel from "../../../../../../components/monitors/NotificationTemplate";
 import dynamic from "next/dynamic";
 import AssignAdminsPanel from "../../../../../../components/monitors/AssignAdmins";
+import { P } from "@antv/g2plot";
 
 var valid_monitors = [
   "uptime_monitor",
@@ -195,6 +196,9 @@ const create_monitor_view = () => {
                 loading();
               }
             );
+          } else {
+            handle_error(response);
+            loading();
           }
         }
       );

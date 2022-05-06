@@ -16,6 +16,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import AssignAdminsPanel from "../../../../../../../components/monitors/AssignAdmins";
 import NotificationRulesPanel from "../../../../../../../components/monitors/NotificationRules";
+import NotificationTemplatePanel from "../../../../../../../components/monitors/NotificationTemplate";
 import RetentionSchedulePanel from "../../../../../../../components/monitors/RetentionSchedulePanel";
 import DetailsPanel from "../../../../../../../components/monitor_panels";
 import RightAlignedButtonWrapper from "../../../../../../../components/ui/RetentionSchedulePanel";
@@ -205,6 +206,9 @@ const create_monitor_view = () => {
                 loading();
               }
             );
+          } else {
+            handle_error(response);
+            loading();
           }
         }
       );
@@ -358,6 +362,13 @@ const create_monitor_view = () => {
                   <RightAlignedButtonWrapper>
                     {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(1)}>Previous</Button> */}
                     {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion()}>Next</Button> */}
+                  </RightAlignedButtonWrapper>
+                </Panel>
+                <Panel forceRender header="Notification Template" key={3}>
+                  <NotificationTemplatePanel template_id={template?._id} />
+                  <RightAlignedButtonWrapper>
+                    {/* <Button icon={<UpOutlined/>} onClick={()=>setAccordion(2)}>Previous</Button> */}
+                    {/* <Button type="primary" icon={<DownOutlined/>} onClick={()=>setAccordion(4)}>Next</Button> */}
                   </RightAlignedButtonWrapper>
                 </Panel>
                 {/* <Panel forceRender header="Notification Template" key={3}>
