@@ -166,7 +166,7 @@ const create_monitor_view = () => {
     merged.device_id = device_id;
     // return console.log(merged);
     const loading = message.loading("Creating monitor...", 0);
-    if (data.template_name) {
+    if (data.editing_template) {
       await secure_axios(
         "/notifs/create",
         {

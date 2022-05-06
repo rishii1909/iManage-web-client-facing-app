@@ -64,7 +64,10 @@ const NotificationTemplatePanel = ({ template_id }) => {
           </Select>
         </Form.Item>
       )}
-      <div
+      <Form.Item
+        label={"Edit Template"}
+        name={"editing_template"}
+        valuePropName={"checked"}
         style={{
           display: "flex",
           alignItems: "center",
@@ -78,15 +81,8 @@ const NotificationTemplatePanel = ({ template_id }) => {
           onChange={(e) => {
             setEditingTemplate(e.target.checked);
           }}
-        />{" "}
-        <p
-          style={{
-            margin: "0px",
-          }}
-        >
-          Edit Template
-        </p>
-      </div>
+        />
+      </Form.Item>
       {selectedTemplate.name && (
         <>
           <Form.Item
