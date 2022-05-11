@@ -41,8 +41,8 @@ const { TabPane } = Tabs;
 const device_view = () => {
   const router = useRouter();
   const { device_type, device_id } = router.query;
-  const [device, setDevice] = useState(device_id);
-  const [server_type, setServer_type] = useState(false);
+  const [device, setDevice] = useState();
+  const [server_type, setServer_type] = useState();
   const [monitors, setMonitors] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [performanceModalVisible, setPerformanceModalVisible] = useState(false);
@@ -63,15 +63,15 @@ const device_view = () => {
             console.log(data);
             setMonitors(data.monitors);
             console.log("DEVICE", data);
+            data.snmp = snmp[data.snmp];
+            data.type = formValToTypes[data.type];
             setDevice(data);
+            console.log(data);
             setServer_type(data.type);
-            setServer_type(1);
             let auth_data = null;
             if (data.creds.password) auth_data = 0;
             if (data.creds.privateKey) auth_data = 1;
             handleAuth(auth_data);
-            data.snmp = snmp[data.snmp];
-            data.type = types[data.type];
             setDeviceRemote(data.type);
             form.setFieldsValue({
               ...response.response,
@@ -368,6 +368,7 @@ const device_view = () => {
                 </Link>
               )}
             >
+              {/* {"Server type: " + server_type} */}
               {server_type == 0 && (
                 <>
                   <List.Item
@@ -401,6 +402,7 @@ const device_view = () => {
                   </Link>
                 </>
               )}
+
               <Modal
                 title="Add a Performance monitor"
                 visible={performanceModalVisible}
