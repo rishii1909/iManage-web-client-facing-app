@@ -1,7 +1,5 @@
-import { Form, Input, InputNumber, Slider } from "antd";
-import { useState } from "react";
+import { Form, Input } from "antd";
 
-const { TextArea } = Input;
 const TCPMonitorSettings = ({ hostname }) => {
   return (
     <>

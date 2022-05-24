@@ -93,22 +93,24 @@ const DetailsPanel = ({
             placeholder={`Select ${device_type} agent`}
             onChange={(val) => agentCallback(val)}
             defaultActiveFirstOption
-            disabled
+            // disabled
             // defaultValue={ teamAgents.length ?  teamAgents[0]._id : false}
           >
             {teamAgents &&
-              teamAgents.map((el) => {
-                return (
-                  <Option value={el._id} key={el._id}>
-                    <div>
-                      {el.name} |{" "}
-                      <span style={{ fontSize: "0.8em", color: "gray" }}>
-                        {el.api_url}
-                      </span>
-                    </div>
-                  </Option>
-                );
-              })}
+              teamAgents
+                .filter((agent) => agent.type === device_agent)
+                .map((el) => {
+                  return (
+                    <Option value={el._id} key={el._id}>
+                      <div>
+                        {el.name} |{" "}
+                        <span style={{ fontSize: "0.8em", color: "gray" }}>
+                          {el.api_url}
+                        </span>
+                      </div>
+                    </Option>
+                  );
+                })}
           </Select>
         </Form.Item>
       )}
