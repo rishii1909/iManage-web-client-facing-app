@@ -1,25 +1,9 @@
-import {
-  CheckSquareFilled,
-  CloseSquareFilled,
-  PieChartOutlined,
-  TableOutlined,
-  WarningFilled,
-} from "@ant-design/icons";
-import {
-  Button,
-  Col,
-  Divider,
-  PageHeader,
-  Row,
-  Spin,
-  Statistic,
-  Table,
-  Tabs,
-  Tag,
-} from "antd";
+import { CheckSquareFilled, CloseSquareFilled, PieChartOutlined, TableOutlined, WarningFilled } from "@ant-design/icons";
+import { Button, Col, Divider, PageHeader, Row, Spin, Statistic, Table, Tabs, Tag } from "antd";
+import axios from "axios";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { handle_error } from "../../helpers/auth";
+import { getAccessToken, handle_error } from "../../helpers/auth";
 import styles from "./dashboard.module.css";
 import Layout from "./layout/layout";
 
@@ -97,12 +81,23 @@ const NewDashboard = () => {
   const levelThreeRef = useRef();
 
   useEffect(() => {
-    fetch("https://injoi.store/monitors/dashboard/showcase/v3")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.accomplished) {
-          setNewDashboard(data.response);
+    const userData = getAccessToken();
+
+    axios
+      .post(
+        "https://injoi.store/monitors/dashboard/showcase/v3",
+        { user_id: userData.user_id, team_id: userData.team_id },
+        {
+          headers: {
+            Authorization: "Bearer " + (userData ? userData.auth_token : ""),
+          },
+        }
+      )
+      .then((res) => {
+        if (res.data.accomplished) {
+          setNewDashboard(res.data.response);
           setLoadingDashboard(false);
+          return;
         }
 
         handle_error(res);
@@ -284,47 +279,44 @@ const NewDashboard = () => {
                     padding: "24px",
                   }}
                 >
-                  {Object.keys(newDashboard.level_2[levelTwo.value]).map(
-                    (deviceName) => {
-                      const deviceData =
-                        newDashboard.level_2[levelTwo.value][deviceName];
+                  {Object.keys(newDashboard.level_2[levelTwo.value]).map((deviceName) => {
+                    const deviceData = newDashboard.level_2[levelTwo.value][deviceName];
 
-                      return (
-                        <Col
-                          span={8}
-                          className={styles["monitor_box"]}
-                          onClick={() => {
-                            setLevelThree({
-                              title: `Monitors Under ${deviceName}`,
-                              value: deviceName,
-                            });
-                          }}
-                        >
-                          <h3 style={{ textAlign: "center" }}>{deviceName}</h3>
+                    return (
+                      <Col
+                        span={8}
+                        className={styles["monitor_box"]}
+                        onClick={() => {
+                          setLevelThree({
+                            title: `Monitors Under ${deviceName}`,
+                            value: deviceName,
+                          });
+                        }}
+                      >
+                        <h3 style={{ textAlign: "center" }}>{deviceName}</h3>
 
-                          <Pie
-                            {...getPieConfig([
-                              {
-                                type: num_status_dict[0],
-                                value: deviceData[0],
-                              },
-                              {
-                                type: num_status_dict[1],
-                                value: deviceData[1],
-                              },
-                              {
-                                type: num_status_dict[2],
-                                value: deviceData[2],
-                              },
-                            ])}
-                            width={250}
-                            height={250}
-                            style={{ margin: "0px" }}
-                          />
-                        </Col>
-                      );
-                    }
-                  )}
+                        <Pie
+                          {...getPieConfig([
+                            {
+                              type: num_status_dict[0],
+                              value: deviceData[0],
+                            },
+                            {
+                              type: num_status_dict[1],
+                              value: deviceData[1],
+                            },
+                            {
+                              type: num_status_dict[2],
+                              value: deviceData[2],
+                            },
+                          ])}
+                          width={250}
+                          height={250}
+                          style={{ margin: "0px" }}
+                        />
+                      </Col>
+                    );
+                  })}
                 </Row>
               </Tabs.TabPane>
 
@@ -389,11 +381,8 @@ const NewDashboard = () => {
                       align: "right",
                     },
                   ]}
-                  dataSource={Object.keys(
-                    newDashboard.level_2[levelTwo.value]
-                  ).map((deviceName) => {
-                    const deviceData =
-                      newDashboard.level_2[levelTwo.value][deviceName];
+                  dataSource={Object.keys(newDashboard.level_2[levelTwo.value]).map((deviceName) => {
+                    const deviceData = newDashboard.level_2[levelTwo.value][deviceName];
 
                     const monitorsUp = deviceData[0];
                     const monitorsWarning = deviceData[1];
@@ -432,62 +421,58 @@ const NewDashboard = () => {
             gridGap: "16px",
           }}
         >
-          {Object.keys(newDashboard.level_3[levelThree.value]).map(
-            (monitorRef) => {
-              const monitorData =
-                newDashboard.level_3[levelThree.value][monitorRef];
+          {Object.keys(newDashboard.level_3[levelThree.value]).map((monitorRef) => {
+            const monitorData = newDashboard.level_3[levelThree.value][monitorRef];
 
-              return (
+            return (
+              <div
+                style={{
+                  width: "280px",
+                  padding: "8px",
+                  backgroundColor: color_type_dict[monitorData.monitor_status] + "11",
+                }}
+              >
                 <div
                   style={{
-                    width: "280px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                     padding: "8px",
-                    backgroundColor:
-                      color_type_dict[monitorData.monitor_status] + "11",
                   }}
                 >
                   <div
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: "8px",
+                      color: "rgba(0, 0, 0)",
+                      fontSize: "16px",
+                      fontWeight: "600",
                     }}
                   >
-                    <div
-                      style={{
-                        color: "rgba(0, 0, 0)",
-                        fontSize: "16px",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {monitorData.label || "iManage Monitor"}
-                    </div>
-
-                    <Statistic
-                      valueStyle={{
-                        color: color_type_dict[monitorData.monitor_status],
-                        fontSize: "14px",
-                      }}
-                      prefix={prefix_type_dict[monitorData.monitor_status]}
-                      value={num_status_dict[monitorData.monitor_status]}
-                    />
+                    {monitorData.label || "iManage Monitor"}
                   </div>
 
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "flex-end",
-                      marginTop: "24px",
+                  <Statistic
+                    valueStyle={{
+                      color: color_type_dict[monitorData.monitor_status],
+                      fontSize: "14px",
                     }}
-                  >
-                    <Tag>{monitorRef}</Tag>
-                  </div>
+                    prefix={prefix_type_dict[monitorData.monitor_status]}
+                    value={num_status_dict[monitorData.monitor_status]}
+                  />
                 </div>
-              );
-            }
-          )}
+
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    marginTop: "24px",
+                  }}
+                >
+                  <Tag>{monitorRef}</Tag>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </Layout>
