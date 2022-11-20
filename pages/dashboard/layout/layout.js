@@ -206,7 +206,12 @@ export default function dashboard({ domain, subdomain, children }) {
               <Menu.Item key="contact-us">
                 <Link href={`/contact-us`}>Contact Us</Link>
               </Menu.Item>
+
+              <Menu.Item key="pricing">
+                <Link href={`${base_route}/pricing`}>Pricing</Link>
+              </Menu.Item>
             </Menu>
+            
           </Sider>
           <Layout style={{ padding: "0.5em 2em", margin: "0px auto" }}>
             <Content
