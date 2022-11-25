@@ -36,17 +36,21 @@ const PaymentPage = () => {
   const handleClick = (params) => {
     setIsModalOpen(false);
     router.push({
-      pathname: `stripe-payment/${params.id}`,
+      pathname: `upgrade-plan/${params.id}`,
       query: params,
     });
   };
   useEffect(() => {
-    createPaymentMethod(router.query);
+    console.log(router.query, "PAYMENT API ");
+    if (router.query.fromPage == "upgrade") {
+      upgradePaymentMethod(router.query);
+    } else {
+      createPaymentMethod(router.query);
+    }
     setQueryParams(router.query);
   }, [router.query]);
 
   const createPaymentMethod = (data) => {
-    console.log(data);
     if (data.payment_intent) {
       const dataToPass = {
         paymentId: data.payment_intent,
@@ -54,6 +58,34 @@ const PaymentPage = () => {
         payment_intent_client_secret: data.redirect_status,
         planId: data.planid,
         deviceValue: data.dvalue,
+      };
+      secure_axios(`/plans/createPayment`, dataToPass, router, (res) => {
+        if (res.accomplished) {
+          if (res.accomplished) {
+            console.log(res);
+            var getUserDetails = {
+              docId: res.response.response._id,
+            };
+            getUserDetail(getUserDetails);
+          }
+        } else {
+          handle_error(res);
+        }
+      });
+    } else if ((data.frompage = "list-page" && data.docId)) {
+      console.log("list page", data);
+      getUserDetail(data);
+    }
+  };
+
+  const upgradePaymentMethod = (data) => {
+    if (data.payment_intent) {
+      const dataToPass = {
+        paymentId: data.payment_intent,
+        paymentStatus: data.redirect_status,
+        payment_intent_client_secret: data.redirect_status,
+        planId: data.planid,
+        upgradePlan: true,
       };
       secure_axios(`/plans/createPayment`, dataToPass, router, (res) => {
         if (res.accomplished) {
@@ -94,17 +126,17 @@ const PaymentPage = () => {
 
   return (
     <Layout>
-       {planDetails == null && 
-          <Spin
-            size={"large"}
-            style={{
-              display: "block",
-              margin: "48px auto",
-            }}
-          />
-        }
+      {planDetails == null && (
+        <Spin
+          size={"large"}
+          style={{
+            display: "block",
+            margin: "48px auto",
+          }}
+        />
+      )}
       <Space direction="vertical">
-        {planDetails && 
+        {planDetails && planDetails.plan_info && (
           <Card
             title="Subscription"
             extra={
@@ -116,7 +148,6 @@ const PaymentPage = () => {
             }
             style={{ width: "100%" }}
           >
-            
             <Descriptions>
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
@@ -138,9 +169,10 @@ const PaymentPage = () => {
               </Descriptions.Item>
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
-                label="Amount"
+                label="Plan Price"
               >
-                ${planDetails.amount}{" "}
+                {/* $ */}
+                {planDetails.plan_info.price}{" "}
               </Descriptions.Item>
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
@@ -190,10 +222,8 @@ const PaymentPage = () => {
                 </Descriptions.Item>
               )}
             </Descriptions>
-            
           </Card>
-        }
-       
+        )}
       </Space>
       <Modal
         title="Upgrade To Pro"

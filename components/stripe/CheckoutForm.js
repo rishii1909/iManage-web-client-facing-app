@@ -45,6 +45,7 @@ export default function CheckoutForm(props) {
   }, [stripe]);
 
   const handleSubmit = async (e) => {
+    console.log(props.queryParam);
     e.preventDefault();
 
     if (!stripe || !elements) {
@@ -59,7 +60,7 @@ export default function CheckoutForm(props) {
       elements,
       confirmParams: {
         // Make sure to change this to your payment completion page
-        return_url: `${process.env.WEB_URL}dashboard/purchase-details?planid=${props.queryParams.id}&dvalue=${props.queryParams.deviceValue}`,
+        return_url: `${process.env.WEB_URL}dashboard/purchase-details?planid=${props.queryParams.id}&dvalue=${props.queryParams.deviceValue}&fromPage=${props.fromPage}`,
       },
     });
 
