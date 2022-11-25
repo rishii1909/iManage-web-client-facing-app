@@ -12,6 +12,8 @@
     "@ant-design/charts": "^1.2.14",
     "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-layout": "^6.26.4",
+    "@stripe/react-stripe-js": "^1.15.0",
+    "@stripe/stripe-js": "^1.44.1",
     "ant-design-pro": "^2.3.2",
     "antd": "^4.16.13",
     "axios": "^0.23.0",
@@ -29,6 +31,7 @@
     "react": "17.0.2",
     "react-cursor-dropdown": "^1.1.2",
     "react-dom": "17.0.2",
+    "stripe": "^11.1.0",
     "webpack": "^5.58.2"
   },
   "devDependencies": {
