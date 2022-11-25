@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styles from "./price.module.css";
-import { useRouter } from "next/router";
 import { Button, Radio, Modal } from "antd";
 
 const PriceCard = (props) => {
-  useEffect(() => {
-    console.log(props, "props");
-  }, []);
-
+  const handleClick = (event) => {
+    props.setSelectedCard(props.values._id);
+    props.showModal(props);
+  };
   return (
     <>
       <div className={styles["cards_wrapper"]}>
@@ -31,7 +30,12 @@ const PriceCard = (props) => {
             )}
           </div>
           <div className={styles["cta"]}>
-            <Button type="primary"  onClick={(event)=>props.showModal(event)} shape="round" size={"large"}>
+            <Button
+              type="primary"
+              onClick={(event) => handleClick(event)}
+              shape="round"
+              size={"large"}
+            >
               Buy Now
             </Button>
           </div>

@@ -6,12 +6,9 @@ import { Button, Radio, Modal, notification, Checkbox } from "antd";
 const PriceCard = (props) => {
   const [checked, setChecked] = useState(false);
 
-  useEffect(() => {
-    console.log(props, "props");
-  }, []);
+ 
   const onChange = (e) => {
-    console.log(`checked = ${e.target.checked}`);
-    setChecked(e.target.checked);
+     setChecked(e.target.checked);
   };
 
   return (
@@ -35,16 +32,18 @@ const PriceCard = (props) => {
                 {props.values.hours}
               </p>
             )}
-            
+
             <p className={styles["price_description"]}>
               {" "}
-              <Checkbox  checked={checked} onChange={onChange}>With Support</Checkbox>
+              <Checkbox checked={checked} onChange={onChange}>
+                With Support
+              </Checkbox>
             </p>
           </div>
           <div className={styles["cta"]}>
             <Button
               type="primary"
-              onClick={(event) => props.showModal(event)}
+              onClick={(event) => props.showModal(checked,props.values._id)}
               shape="round"
               size={"large"}
             >
