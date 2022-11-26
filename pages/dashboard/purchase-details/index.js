@@ -159,7 +159,7 @@ const PaymentPage = () => {
                 contentStyle={{ fontWeight: "600", color: "green" }}
                 label="Next Payment Date"
               >
-                {planDetails.validityStart}
+                {planDetails.validityEnd}
               </Descriptions.Item>
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
