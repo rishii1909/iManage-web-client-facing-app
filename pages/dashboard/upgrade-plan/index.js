@@ -22,7 +22,7 @@ const UpgradePage = (props) => {
   };
 
   useEffect(() => {
-    secure_axios(`/plans/getUpgradedPalns`, {}, router, (response) => {
+    secure_axios(`/plans/getUpgradedPlans`, {}, router, (response) => {
       if (response.accomplished) {
         if (response.accomplished) {
           var supportItems = response.response.filter((data) => {

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import styles from "./price.module.css";
 import { Button, Radio, Modal } from "antd";
+import { loadStripe } from "@stripe/stripe-js";
 
+// const stripePromise = loadStripe(process.env.STRIPE_PK_KEY);
 const PriceCard = (props) => {
   const handleClick = (event) => {
     props.setSelectedCard(props.values._id);
+    props.setCardDetails(props.values);
     props.showModal(props);
   };
   return (
@@ -30,7 +33,9 @@ const PriceCard = (props) => {
             )}
           </div>
           <div className={styles["cta"]}>
+
             <Button
+             role="link"
               type="primary"
               onClick={(event) => handleClick(event)}
               shape="round"
@@ -38,6 +43,7 @@ const PriceCard = (props) => {
             >
               Buy Now
             </Button>
+
           </div>
         </div>
       </div>

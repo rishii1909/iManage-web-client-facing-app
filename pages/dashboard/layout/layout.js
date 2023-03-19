@@ -208,7 +208,7 @@ export default function dashboard({ domain, subdomain, children }) {
               </Menu.Item>
 
               <Menu.Item key="pricing">
-                <Link href={`${base_route}/plan-list`}>Pricing</Link>
+                <Link href={`${base_route}/plan-list`}>Subscription</Link>
               </Menu.Item>
             </Menu>
             

@@ -68,7 +68,7 @@ const CardPage = () => {
         }
       );
       secure_axios(
-        `/plans/calculateAmount`,
+        `/plans/calculateAmount?type=upgrade`,
         router.query,
         router,
         (response) => {

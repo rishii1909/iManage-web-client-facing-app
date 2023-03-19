@@ -2,8 +2,12 @@ import Layout from "../layout/layout";
 import { handle_error } from "../../../helpers/auth";
 import { useEffect, useRef, useState } from "react";
 import { DownloadOutlined } from "@ant-design/icons";
-import { Button, Card, Space, Modal, Descriptions, Spin } from "antd";
+import { Button, Card, Space, Modal, Descriptions, Spin,
+  message,
+ } from "antd";
 import UpgradePage from "../upgrade-plan/index";
+import DowngradePage from "../downgrade-plan/index";
+
 import { useRouter } from "next/router";
 import { secure_axios } from "../../../helpers/auth";
 import MakePayment from "../../../components/stripe/index";
@@ -13,11 +17,13 @@ const PaymentPage = () => {
   const [size, setSize] = useState("large"); // default is 'middle'
   const [planDetails, setPlanDetails] = useState(null);
   const [queryParams, setQueryParams] = useState(null);
+  const [upgradeType, setUpgradeType] = useState("upgrade");
 
   const router = useRouter();
 
-  const showModal = () => {
+  const showModal = (type) => {
     setIsModalOpen(true);
+    setUpgradeType(type);
   };
 
   const handleOk = () => {
@@ -35,10 +41,15 @@ const PaymentPage = () => {
   };
   const handleClick = (params) => {
     setIsModalOpen(false);
-    router.push({
-      pathname: `upgrade-plan/${params.id}`,
-      query: params,
-    });
+    if (upgradeType == "downgrade") {
+      console.log("Downgrade Params", params);
+      downgradePlan(params);
+    } else {
+      router.push({
+        pathname: `upgrade-plan/${params.id}`,
+        query: params,
+      });
+    }
   };
   useEffect(() => {
     console.log(router.query, "PAYMENT API ");
@@ -87,12 +98,12 @@ const PaymentPage = () => {
         planId: data.planid,
         upgradePlan: true,
       };
-      secure_axios(`/plans/createPayment`, dataToPass, router, (res) => {
+      secure_axios(`/plans/upgradePayment`, dataToPass, router, (res) => {
         if (res.accomplished) {
           if (res.accomplished) {
             console.log(res);
             var getUserDetails = {
-              docId: res.response.response._id,
+              docId: res.response.updatePurchase._id,
             };
             getUserDetail(getUserDetails);
           }
@@ -124,6 +135,30 @@ const PaymentPage = () => {
     );
   };
 
+  const downgradePlan = (params) => {
+    //downgradePlan
+    if (params.id) {
+      const dataToPass = {
+        planId: params.id,
+        upgradePlan: false,
+      };
+      secure_axios(`/plans/downgradePlan`, dataToPass, router, (res) => {
+        if (res.accomplished) {
+          if (res.accomplished) {
+            console.log(res);
+            var getUserDetails = {
+              docId: res.response.updatePurchase._id,
+            };
+            getUserDetail(getUserDetails);
+            message.success(res.response.message);
+
+          }
+        } else {
+          handle_error(res);
+        }
+      });
+    }
+  };
   return (
     <Layout>
       {planDetails == null && (
@@ -165,27 +200,27 @@ const PaymentPage = () => {
                 contentStyle={{ fontWeight: "600", color: "green" }}
                 label="Payment Id"
               >
-                {planDetails.paymentId}
+                {planDetails.transactions_info.subscriptionId}
               </Descriptions.Item>
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
                 label="Plan Price"
               >
-                {/* $ */}
-                {planDetails.plan_info.price}{" "}
+                {planDetails.isUpgraded && "Additional "}
+                { planDetails.plan_info.price}{" "}
               </Descriptions.Item>
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
-                label="  Devices"
+                label="No of    Devices"
               >
-                {planDetails.plan_info.devices}
+                {planDetails.transactions_info.quantity}
               </Descriptions.Item>
 
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
-                label="No of  Devices"
+                label="Payment Status"
               >
-                {planDetails.noOfdevices}{" "}
+                {planDetails.transactions_info.paymentStatus}{" "}
               </Descriptions.Item>
 
               <Descriptions.Item
@@ -209,10 +244,10 @@ const PaymentPage = () => {
                   label=""
                 >
                   {" "}
-                  <a onClick={(event) => showModal()}>Upgrade Plans</a>
+                  <a onClick={(event) => showModal("upgrade")}>Upgrade My Plan</a>
                 </Descriptions.Item>
               )}
-              {planDetails.isUpgraded && (
+              {/* {planDetails.isUpgraded && (
                 <Descriptions.Item
                   contentStyle={{ fontWeight: "600" }}
                   label="Upgrade Payment Id"
@@ -220,19 +255,37 @@ const PaymentPage = () => {
                   {" "}
                   {planDetails.upgradePaymentId}
                 </Descriptions.Item>
+              )} */}
+              {planDetails.isUpgraded && (
+                <Descriptions.Item
+                  contentStyle={{ fontWeight: "600" }}
+                  label=""
+                >
+                  {" "}
+                  <a onClick={(event) => showModal("downgrade")}>
+                    Downgrade My Plan
+                  </a>
+                </Descriptions.Item>
               )}
             </Descriptions>
           </Card>
         )}
       </Space>
       <Modal
-        title="Upgrade To Pro"
+        title={
+          upgradeType == "upgrade" ? "Upgrade to Pro" : "Downgrade to Lite"
+        }
         visible={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
         footer={null}
       >
-        <UpgradePage handleCancel={(event) => handleClick(event)} />
+        {upgradeType == "upgrade" && (
+          <UpgradePage handleCancel={(event) => handleClick(event)} />
+        )}
+        {upgradeType == "downgrade" && (
+          <DowngradePage handleCancel={(event) => handleClick(event)} />
+        )}
       </Modal>
     </Layout>
   );
