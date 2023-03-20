@@ -182,7 +182,7 @@ const PricingPage = () => {
                             setCardDetails={(ele) => setCardDetails(ele)}
                             showModal={(event) => setIsModalOpen(true)}
                           />
-                        </Card>
+                        </Card> 
                       </Badge.Ribbon>
                     ) : (
                       <Card hoverable bordered={false}>

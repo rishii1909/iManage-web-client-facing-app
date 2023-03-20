@@ -2,20 +2,26 @@ import Layout from "../layout/layout";
 import { handle_error } from "../../../helpers/auth";
 import { useEffect, useRef, useState } from "react";
 import { DownloadOutlined } from "@ant-design/icons";
-import { Button, Card, Space, Modal, Descriptions, Spin,
-  message,
- } from "antd";
+import { Button, Card, Space, Modal, Descriptions, Spin, message } from "antd";
 import UpgradePage from "../upgrade-plan/index";
 import DowngradePage from "../downgrade-plan/index";
 
 import { useRouter } from "next/router";
 import { secure_axios } from "../../../helpers/auth";
 import MakePayment from "../../../components/stripe/index";
+import moment from "moment";
 
 const PaymentPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [size, setSize] = useState("large"); // default is 'middle'
   const [planDetails, setPlanDetails] = useState(null);
+  const [subscriptionDetails, setSubsDetails] = useState(null);
+  const [invoiceDetails, setInvoiceDetails] = useState(null);
+  const [activeSub, setActiveSub] = useState(null);
+  const [subBooleanDetails, setSubBooleanDetails] = useState(null);
+
+  const [scheduleSub, setScheduleSub] = useState(null);
+
   const [queryParams, setQueryParams] = useState(null);
   const [upgradeType, setUpgradeType] = useState("upgrade");
 
@@ -126,7 +132,13 @@ const PaymentPage = () => {
         if (res.accomplished) {
           if (res.accomplished) {
             console.log(res);
-            setPlanDetails(res.response.response);
+            setPlanDetails(res.response.subs.currentProduct);
+            setSubsDetails(res.response.subs.subscription);
+            setInvoiceDetails(res.response.subs.invoice);
+            setActiveSub(res.response.activeSub);
+            setScheduleSub(res.response.subs);
+            setSubBooleanDetails(res.response.response)
+
           } else {
             handle_error(res);
           }
@@ -151,7 +163,6 @@ const PaymentPage = () => {
             };
             getUserDetail(getUserDetails);
             message.success(res.response.message);
-
           }
         } else {
           handle_error(res);
@@ -171,11 +182,11 @@ const PaymentPage = () => {
         />
       )}
       <Space direction="vertical">
-        {planDetails && planDetails.plan_info && (
+        {activeSub &&  (
           <Card
             title="Subscription"
             extra={
-              planDetails && (
+              activeSub && (
                 <Button type="primary" icon={<DownloadOutlined />} size={size}>
                   Download
                 </Button>
@@ -188,46 +199,49 @@ const PaymentPage = () => {
                 contentStyle={{ fontWeight: "600", color: "green" }}
                 label="Current Plan"
               >
-                {planDetails.plan_info.name}
+                {planDetails.name}
               </Descriptions.Item>
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
-                label="Next Payment Date"
+                label="Next Payment Attempt"
               >
-                {planDetails.validityEnd}
+                {invoiceDetails &&
+                  moment
+                    .unix(invoiceDetails.next_payment_attempt)
+                    .format("YYYY-MM-DD")}
               </Descriptions.Item>
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
                 label="Payment Id"
               >
-                {planDetails.transactions_info.subscriptionId}
+                {subscriptionDetails && subscriptionDetails.id}
               </Descriptions.Item>
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
                 label="Plan Price"
               >
-                {planDetails.isUpgraded && "Additional "}
-                { planDetails.plan_info.price}{" "}
+                {subBooleanDetails.isUpgraded && "Additional "}
+                ${activeSub.amount}{" "}
               </Descriptions.Item>
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
                 label="No of    Devices"
               >
-                {planDetails.transactions_info.quantity}
+                {activeSub.quantity}
               </Descriptions.Item>
 
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
                 label="Payment Status"
               >
-                {planDetails.transactions_info.paymentStatus}{" "}
+                {subscriptionDetails && subscriptionDetails.status}{" "}
               </Descriptions.Item>
 
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
                 label="Live Support"
               >
-                {planDetails.plan_info.isSupport
+                {activeSub.isSupport
                   ? "Available"
                   : "Not Available"}{" "}
               </Descriptions.Item>
@@ -235,16 +249,41 @@ const PaymentPage = () => {
                 contentStyle={{ fontWeight: "600", color: "green" }}
                 label="Duraition"
               >
-                {planDetails.plan_info.hours}{" "}
+                {activeSub.hours}{" "}
               </Descriptions.Item>
-
-              {planDetails.plan_info.canUpgrade && (
+              <Descriptions.Item
+                contentStyle={{ fontWeight: "600", color: "green" }}
+                label="Plan Interval "
+              >
+                {subscriptionDetails && subscriptionDetails.plan.interval}{" "}
+              </Descriptions.Item>
+              <Descriptions.Item
+                contentStyle={{ fontWeight: "600", color: "green" }}
+                label="Period Start "
+              >
+                {subscriptionDetails &&
+                  moment
+                    .unix(subscriptionDetails.current_period_start)
+                    .format("YYYY-MM-DD")}{" "}
+              </Descriptions.Item>
+              <Descriptions.Item
+                contentStyle={{ fontWeight: "600", color: "green" }}
+                label="Period End "
+              >
+                {subscriptionDetails &&
+                  moment
+                    .unix(subscriptionDetails.current_period_end)
+                    .format("YYYY-MM-DD")}{" "}
+              </Descriptions.Item>
+              {subBooleanDetails && subBooleanDetails.canUpgrade && (
                 <Descriptions.Item
                   contentStyle={{ fontWeight: "600" }}
                   label=""
                 >
                   {" "}
-                  <a onClick={(event) => showModal("upgrade")}>Upgrade My Plan</a>
+                  <a onClick={(event) => showModal("upgrade")}>
+                    Upgrade My Plan
+                  </a>
                 </Descriptions.Item>
               )}
               {/* {planDetails.isUpgraded && (
@@ -256,7 +295,7 @@ const PaymentPage = () => {
                   {planDetails.upgradePaymentId}
                 </Descriptions.Item>
               )} */}
-              {planDetails.isUpgraded && (
+              {subBooleanDetails && subBooleanDetails.isUpgraded && (
                 <Descriptions.Item
                   contentStyle={{ fontWeight: "600" }}
                   label=""
