@@ -8,7 +8,6 @@ import DowngradePage from "../downgrade-plan/index";
 
 import { useRouter } from "next/router";
 import { secure_axios } from "../../../helpers/auth";
-import MakePayment from "../../../components/stripe/index";
 import moment from "moment";
 
 const PaymentPage = () => {
@@ -19,6 +18,7 @@ const PaymentPage = () => {
   const [invoiceDetails, setInvoiceDetails] = useState(null);
   const [activeSub, setActiveSub] = useState(null);
   const [subBooleanDetails, setSubBooleanDetails] = useState(null);
+  const [currentPlanDetails, setOngoingPlanDetails] = useState(null);
 
   const [scheduleSub, setScheduleSub] = useState(null);
 
@@ -38,12 +38,6 @@ const PaymentPage = () => {
 
   const handleCancel = (params) => {
     setIsModalOpen(false);
-
-    // console.log("upgrade",params, queryParams);
-    // router.push({
-    //   pathname: `stripe-payment/${params.id}`,
-    //   query: params,
-    // });
   };
   const handleClick = (params) => {
     setIsModalOpen(false);
@@ -58,7 +52,6 @@ const PaymentPage = () => {
     }
   };
   useEffect(() => {
-    console.log(router.query, "PAYMENT API ");
     if (router.query.fromPage == "upgrade") {
       upgradePaymentMethod(router.query);
     } else {
@@ -130,17 +123,21 @@ const PaymentPage = () => {
       router,
       (res) => {
         if (res.accomplished) {
-          if (res.accomplished) {
+          if (res.response.paymentDone) {
             console.log(res);
             setPlanDetails(res.response.subs.currentProduct);
             setSubsDetails(res.response.subs.subscription);
             setInvoiceDetails(res.response.subs.invoice);
             setActiveSub(res.response.activeSub);
-            setScheduleSub(res.response.subs);
-            setSubBooleanDetails(res.response.response)
-
+            setOngoingPlanDetails(res.response.currentplan);
+            if (res.response.subs.subscription.schedule)
+              setScheduleSub(res.response.subs);
+            setSubBooleanDetails(res.response.response);
           } else {
             handle_error(res);
+            router.push({
+              pathname: `plan-list`,
+            });
           }
         }
       }
@@ -159,7 +156,7 @@ const PaymentPage = () => {
           if (res.accomplished) {
             console.log(res);
             var getUserDetails = {
-              docId: res.response.updatePurchase._id,
+              docId: res.response.response._id,
             };
             getUserDetail(getUserDetails);
             message.success(res.response.message);
@@ -170,6 +167,7 @@ const PaymentPage = () => {
       });
     }
   };
+
   return (
     <Layout>
       {planDetails == null && (
@@ -182,7 +180,7 @@ const PaymentPage = () => {
         />
       )}
       <Space direction="vertical">
-        {activeSub &&  (
+        {activeSub && subBooleanDetails && invoiceDetails && (
           <Card
             title="Subscription"
             extra={
@@ -212,7 +210,7 @@ const PaymentPage = () => {
               </Descriptions.Item>
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
-                label="Payment Id"
+                label="Subscription Id"
               >
                 {subscriptionDetails && subscriptionDetails.id}
               </Descriptions.Item>
@@ -220,8 +218,8 @@ const PaymentPage = () => {
                 contentStyle={{ fontWeight: "600", color: "green" }}
                 label="Plan Price"
               >
-                {subBooleanDetails.isUpgraded && "Additional "}
-                ${activeSub.amount}{" "}
+                {activeSub.paymentType=="upgrade" &&  subBooleanDetails.isUpgraded && "Additional "}
+                {currentPlanDetails && currentPlanDetails.price}
               </Descriptions.Item>
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
@@ -241,7 +239,7 @@ const PaymentPage = () => {
                 contentStyle={{ fontWeight: "600", color: "green" }}
                 label="Live Support"
               >
-                {activeSub.isSupport
+                {currentPlanDetails && currentPlanDetails.isSupport
                   ? "Available"
                   : "Not Available"}{" "}
               </Descriptions.Item>
@@ -249,7 +247,9 @@ const PaymentPage = () => {
                 contentStyle={{ fontWeight: "600", color: "green" }}
                 label="Duraition"
               >
-                {activeSub.hours}{" "}
+                {currentPlanDetails && currentPlanDetails.hours == ""
+                  ? "0 hrs"
+                  : currentPlanDetails.hours}{" "}
               </Descriptions.Item>
               <Descriptions.Item
                 contentStyle={{ fontWeight: "600", color: "green" }}
@@ -275,37 +275,98 @@ const PaymentPage = () => {
                     .unix(subscriptionDetails.current_period_end)
                     .format("YYYY-MM-DD")}{" "}
               </Descriptions.Item>
-              {subBooleanDetails && subBooleanDetails.canUpgrade && (
-                <Descriptions.Item
-                  contentStyle={{ fontWeight: "600" }}
-                  label=""
-                >
-                  {" "}
-                  <a onClick={(event) => showModal("upgrade")}>
-                    Upgrade My Plan
-                  </a>
-                </Descriptions.Item>
-              )}
-              {/* {planDetails.isUpgraded && (
-                <Descriptions.Item
-                  contentStyle={{ fontWeight: "600" }}
-                  label="Upgrade Payment Id"
-                >
-                  {" "}
-                  {planDetails.upgradePaymentId}
-                </Descriptions.Item>
-              )} */}
-              {subBooleanDetails && subBooleanDetails.isUpgraded && (
-                <Descriptions.Item
-                  contentStyle={{ fontWeight: "600" }}
-                  label=""
-                >
-                  {" "}
-                  <a onClick={(event) => showModal("downgrade")}>
-                    Downgrade My Plan
-                  </a>
-                </Descriptions.Item>
-              )}
+              {subBooleanDetails &&
+                subBooleanDetails.isUpgraded == false &&
+                scheduleSub == null && (
+                  <Descriptions.Item
+                    contentStyle={{ fontWeight: "600" }}
+                    label=""
+                  >
+                    {" "}
+                    <a onClick={(event) => showModal("upgrade")}>
+                      Upgrade My Plan
+                    </a>
+                  </Descriptions.Item>
+                )}
+
+              {subBooleanDetails &&
+                subBooleanDetails.isUpgraded == true &&
+                scheduleSub == null && (
+                  <Descriptions.Item
+                    contentStyle={{ fontWeight: "600" }}
+                    label=""
+                  >
+                    {" "}
+                    <a onClick={(event) => showModal("downgrade")}>
+                      Downgrade My Plan
+                    </a>
+                  </Descriptions.Item>
+                )}
+            </Descriptions>
+          </Card>
+        )}
+        {scheduleSub != null && (
+          <Card title="Scheduled Subscription" style={{ width: "100%" }}>
+            <Descriptions>
+              <Descriptions.Item
+                contentStyle={{ fontWeight: "600", color: "green" }}
+                label="Upcoming  Plan"
+              >
+                {scheduleSub.schProductDetails.name}
+              </Descriptions.Item>
+              <Descriptions.Item
+                contentStyle={{ fontWeight: "600", color: "green" }}
+                label="Next Payment Attempt"
+              >
+                {moment
+                  .unix(scheduleSub.invoice.next_payment_attempt)
+                  .format("YYYY-MM-DD")}
+              </Descriptions.Item>
+              {/* <Descriptions.Item
+                contentStyle={{ fontWeight: "600", color: "green" }}
+                label="Product Id"
+              >
+                {scheduleSub.schProductDetails.id}
+              </Descriptions.Item> */}
+              <Descriptions.Item
+                contentStyle={{ fontWeight: "600", color: "green" }}
+                label="Plan Price"
+              >
+                ${scheduleSub.schPriceDetails.unit_amount / 100}{" "}
+              </Descriptions.Item>
+
+              {/* <Descriptions.Item
+                contentStyle={{ fontWeight: "600", color: "green" }}
+                label="Payment Status"
+              >
+                {subscriptionDetails && subscriptionDetails.status}{" "}
+              </Descriptions.Item> */}
+
+              <Descriptions.Item
+                contentStyle={{ fontWeight: "600", color: "green" }}
+                label="Live Support"
+              >
+                {scheduleSub.schProductDetails.metadata.support == "true"
+                  ? "Available"
+                  : "Not Available"}{" "}
+              </Descriptions.Item>
+
+              <Descriptions.Item
+                contentStyle={{ fontWeight: "600", color: "green" }}
+                label="Period Start "
+              >
+                {moment
+                  .unix(scheduleSub.subscriptionSchedule.phases[1].start_date)
+                  .format("YYYY-MM-DD")}
+              </Descriptions.Item>
+              <Descriptions.Item
+                contentStyle={{ fontWeight: "600", color: "green" }}
+                label="Period End "
+              >
+                {moment
+                  .unix(scheduleSub.subscriptionSchedule.phases[1].end_date)
+                  .format("YYYY-MM-DD")}
+              </Descriptions.Item>
             </Descriptions>
           </Card>
         )}

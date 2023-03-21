@@ -1,10 +1,7 @@
 import { handle_error, secure_axios } from "../../../helpers/auth";
 import { useEffect, useRef, useState } from "react";
-import Router from "next/router";
-import { notification } from "antd";
 import PriceCard from "./priceCard";
 import { useRouter } from "next/router";
-import MakePayment from "../../../components/stripe/index";
 
 const UpgradePage = (props) => {
   const [priceList, setPriceList] = useState([]);
@@ -17,8 +14,6 @@ const UpgradePage = (props) => {
       frompage: "upgrade",
     };
     props.handleCancel(dataToPass);
-
-    //redirect to stripe Page
   };
 
   useEffect(() => {

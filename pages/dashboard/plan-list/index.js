@@ -39,10 +39,10 @@ const PricingPage = () => {
     setIsModalOpen(false);
     setLoading(true);
 
-    router.push({
-      pathname: `stripe-payment/${selectedCard}`,
-      query: { deviceValue: deviceValue, frompage: "list-page" },
-    });
+    // router.push({
+    //   pathname: `stripe-payment/${selectedCard}`,
+    //   query: { deviceValue: deviceValue, frompage: "list-page" },
+    // });
   };
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -228,7 +228,7 @@ const PricingPage = () => {
         <Modal
           title="Payment Confirmation"
           visible={isModalOpen}
-          onOk={(event) => handleOk(event)}
+          // onOk={(event) => handleOk(event)}
           onCancel={handleCancel}
           footer={null}
         >

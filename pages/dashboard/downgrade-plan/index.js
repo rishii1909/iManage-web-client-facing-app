@@ -4,7 +4,6 @@ import Router from "next/router";
 import { notification } from "antd";
 import PriceCard from "./priceCard";
 import { useRouter } from "next/router";
-import MakePayment from "../../../components/stripe/index";
 
 const DowngradePage = (props) => {
   const [priceList, setPriceList] = useState([]);

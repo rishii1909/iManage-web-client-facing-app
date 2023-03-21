@@ -1,23 +1,21 @@
 import Layout from "../layout/layout";
 import React, { useState, useEffect } from "react";
-import MakePayment from "../../../components/stripe/index";
-import styles from "../plan-list/price.module.css";
+import moment from "moment";
 import { useRouter } from "next/router";
 import { handle_error } from "../../../helpers/auth";
-import { Button, Col, Row, Spin, Card, Space, Badge, Typography } from "antd";
+import { Button, Col, Row, Spin, Card, Space, Table, message } from "antd";
 import { secure_axios } from "../../../helpers/auth";
 
 const CardPage = () => {
   const router = useRouter();
   const [priceCard, setPriceCard] = useState(null);
-  const [deviceValue, setNoOfDevices] = useState(0);
-  const [priceTotal, setTotalPrice] = useState(0);
-  const [symbol, setSymbol] = useState(process.env.CUR_SYM);
+  const [invoiceDetails, setInvoiceDetails] = useState(null);
+  const [prorationamount, setProrationamount] = useState(0);
+  const [upcomingInvoiceDetails, setUpcomingInvoiceDetails] = useState(null);
+  const [loader, setLoader] = useState(false);
 
   useEffect(() => {
-     if (router.query.id != undefined && router.query.frompage == "list-page") {
-      if (router.query.deviceValue) setNoOfDevices(router.query.deviceValue);
-
+    if (router.query.id != undefined && router.query.frompage == "upgrade") {
       secure_axios(
         `/plans/getPriceConfig`,
         { id: router.query.id },
@@ -34,47 +32,22 @@ const CardPage = () => {
         }
       );
       secure_axios(
-        `/plans/calculateAmount`,
+        `/plans/previewProration`,
         router.query,
         router,
         (response) => {
           if (response.accomplished) {
             if (response.accomplished) {
-              setTotalPrice(response.response.purchaseAmount);
-            } else handle_error(response);
-          } else {
-            handle_error(response);
-          }
-        }
-      );
-    } else if (
-      router.query.id != undefined &&
-      router.query.frompage == "upgrade"
-    ) {
-      setNoOfDevices(1);
-      secure_axios(
-        `/plans/getPriceConfig`,
-        { id: router.query.id },
-        router,
-        (response) => {
-          if (response.accomplished) {
-            if (response.accomplished) {
-              setPriceCard(response.response[0]);
-            }
-          } else {
-            handle_error(response);
-            setPriceList(false);
-          }
-        }
-      );
-      secure_axios(
-        `/plans/calculateAmount?type=upgrade`,
-        router.query,
-        router,
-        (response) => {
-          if (response.accomplished) {
-            if (response.accomplished) {
-              setTotalPrice(response.response.purchaseAmount);
+              if (response.response.proRationAmount.lines.data.length == 3) {
+                setInvoiceDetails(
+                  response.response.proRationAmount.lines.data.slice(0, 2)
+                );
+                setProrationamount(
+                  response.response.proRationAmount.lines.data[1].amount +
+                    response.response.proRationAmount.lines.data[0].amount
+                );
+                setUpcomingInvoiceDetails(response.response.proRationAmount);
+              }
             } else handle_error(response);
           } else {
             handle_error(response);
@@ -86,9 +59,57 @@ const CardPage = () => {
     }
   }, []);
 
+  const upgradePlan = (event) => {
+    event.preventDefault();
+    setLoader(true);
+    secure_axios(
+      `/plans/upgradePlan`,
+      { planId: priceCard._id },
+      router,
+      (resp) => {
+        setLoader(false);
+
+        if (resp.accomplished) {
+          if (resp.response.success) 
+          {
+            message.success(resp.response.message);
+            router.back();
+          }
+          else {
+            message.error(resp.response.message);
+            router.back();
+          }
+        } else {
+          handle_error(resp);
+        }
+      }
+    );
+  };
   const goBackListingPage = () => {
     router.back();
   };
+  const fixedColumns = [
+    {
+      title: "Description",
+      dataIndex: "description",
+      fixed: "left",
+      width: 500,
+    },
+    {
+      title: "Quantity",
+      dataIndex: "quantity",
+      fixed: "left",
+      width: 100,
+    },
+    {
+      title: "Amount",
+      dataIndex: "amount",
+      fixed: "left",
+      width: 100,
+      render: (text) => <a>{text / 100} $</a>,
+    },
+  ];
+
   return (
     <Layout>
       {!priceCard ? (
@@ -101,84 +122,73 @@ const CardPage = () => {
         />
       ) : (
         <Space direction="vertical">
-          <div className="site-card-wrapper">
-            <Card
-              style={{ width: "120%" }}
-              title="Upgrade Payment  "
-              extra={
-                <Button type="link" onClick={(event) => goBackListingPage()}>
-                  Back
-                </Button>
-              }
-              bordered={false}
-            >
-              <Row>
-                <Col span={10}>
-                  {/* <Title level={5}>No of devices entered : {deviceValue}</Title> */}
-
-                  {priceCard.isSupport ? (
-                    <Badge.Ribbon text="Live Support" dot="false">
-                      <Card bordered={true}>
-                        <div className={styles["cards_wrapper"]}>
-                          <div className={styles["pricing_card two"]}>
-                            <div className={styles["details"]}>
-                              <h2 className={styles["title"]}>
-                                {priceCard.name}
-                              </h2>
-                              <p className={styles["plan_description"]}>
-                                {priceCard.devices}
-                              </p>
-
-                              <p className={styles["price"]}>
-                                {symbol}
-                                {priceTotal}
-                              </p>
-                              <p className={styles["price_description"]}>
-                                {priceCard.other}
-                              </p>
-                              <p className={styles["price_description"]}>
-                                {priceCard.hours}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    </Badge.Ribbon>
-                  ) : (
-                    <Card bordered={true}>
-                      <div className={styles["cards_wrapper"]}>
-                        <div className={styles["pricing_card two"]}>
-                          <div className={styles["details"]}>
-                            <h2 className={styles["title"]}>
-                              {priceCard.name}
-                            </h2>
-                            <p className={styles["plan_description"]}>
-                              {priceCard.devices}
-                            </p>
-
-                            <p className={styles["price"]}>{priceTotal}</p>
-                            <p className={styles["price_description"]}>
-                              {priceCard.other}
-                            </p>
-                            {priceCard.isSupport == true && (
-                              <p className={styles["price_description"]}>
-                                {priceCard.hours}{" "}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  )}
-                </Col>
-                <Col span={10}>
-                  <br />
- 
-                  <MakePayment priceCard={priceCard}  fromPage="upgrade" />
-                </Col>
-              </Row>
-            </Card>
-          </div>
+          <Spin tip="Please wait. Attempting to pay..." spinning={loader}>
+            <div className="site-card-wrapper">
+              <Card
+                style={{ width: "120%" }}
+                title="Upgrade Payment  "
+                extra={
+                  <Button type="link" onClick={(event) => goBackListingPage()}>
+                    Back
+                  </Button>
+                }
+                bordered={false}
+              >
+                <Row>
+                  <Col>
+                    <Table
+                      title={() => (
+                        <b>
+                          {upcomingInvoiceDetails &&
+                            upcomingInvoiceDetails.lines.data[2]
+                              .description}{" "}
+                          {priceCard.isSupport ? priceCard.hours : ""}
+                        </b>
+                      )}
+                      footer={() => (
+                        <Button
+                          type="primary"
+                          onClick={(event) => upgradePlan(event)}
+                        >
+                          Pay
+                        </Button>
+                      )}
+                      columns={fixedColumns}
+                      dataSource={invoiceDetails}
+                      pagination={false}
+                      bordered
+                      summary={() => (
+                        <Table.Summary fixed>
+                          <Table.Summary.Row>
+                            <Table.Summary.Cell index={0}>
+                              Summary (
+                              <b>
+                                {" "}
+                                {upcomingInvoiceDetails &&
+                                  moment
+                                    .unix(upcomingInvoiceDetails.period_start)
+                                    .format("ll")}{" "}
+                                -
+                                {upcomingInvoiceDetails &&
+                                  moment
+                                    .unix(upcomingInvoiceDetails.period_end)
+                                    .format("ll")}
+                                )
+                              </b>
+                            </Table.Summary.Cell>
+                            <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                            <Table.Summary.Cell index={1}>
+                              {prorationamount / 100}$
+                            </Table.Summary.Cell>
+                          </Table.Summary.Row>
+                        </Table.Summary>
+                      )}
+                    />
+                  </Col>
+                </Row>
+              </Card>
+            </div>
+          </Spin>
         </Space>
       )}
     </Layout>
