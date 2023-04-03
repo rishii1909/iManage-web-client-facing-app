@@ -6,6 +6,8 @@ import { useRouter } from "next/router";
 const UpgradePage = (props) => {
   const [priceList, setPriceList] = useState([]);
   const [supportId, setSupportId] = useState("");
+  const [supportHours, setSupportHrs] = useState("");
+
   const router = useRouter();
 
   const handleClick = (checked, id) => {
@@ -25,6 +27,8 @@ const UpgradePage = (props) => {
           });
           if (supportItems.length != 0) {
             setSupportId(supportItems[0]._id);
+            setSupportHrs(supportItems[0].hours)
+
           }
           setPriceList(
             response.response.filter((data) => {
@@ -46,6 +50,8 @@ const UpgradePage = (props) => {
           <PriceCard
             key={data._id}
             values={data}
+            supportHours={supportHours}
+
             showModal={(checked, id) => handleClick(checked, id)}
           />
         );

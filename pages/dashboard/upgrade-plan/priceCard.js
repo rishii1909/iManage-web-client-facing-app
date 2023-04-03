@@ -27,9 +27,9 @@ const PriceCard = (props) => {
 
             <p className={styles["price_description"]}>{props.values.other}</p>
 
-            {props.values.isSupport == true && checked && (
+            {  checked && (
               <p className={styles["price_description"]}>
-                {props.values.hours}
+                {props.supportHours}
               </p>
             )}
 
